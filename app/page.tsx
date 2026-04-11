@@ -1,99 +1,56 @@
 'use client';
 
-import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import {
+  LazyMotion,
+  domAnimation,
+  m,
+  AnimatePresence,
+  useInView,
+} from 'framer-motion';
 import BreathingOrb from './components/BreathingOrb';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DATA
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
 
-const loopLines = [
-  'Unlock.',
-  'Check.',
-  'Refresh.',
-  'Switch apps.',
-  'Repeat.',
-  'Ten minutes disappear.',
-  'Not because you wanted to.',
-  'Because the loop already started.',
-];
+const WALK_PHASES = ['trigger', 'lock', 'breathing', 'complete', 'firewall'] as const;
+type WalkPhase = (typeof WALK_PHASES)[number];
 
-const triggerScenarios = [
-  { title: 'Reflex', body: "I just opened it again. I didn't even think about it." },
-  { title: 'Focus loss', body: "I was trying to focus. Now I'm 15 minutes deep." },
-  { title: 'Awareness', body: "I know this is making it worse and I'm still here." },
-  { title: 'Time distortion', body: "It's been an hour. I don't even remember why I picked it up." },
-];
+const PHASE_DURATIONS: Record<WalkPhase, number> = {
+  trigger: 3500,
+  lock: 2500,
+  breathing: 4000,
+  complete: 3000,
+  firewall: 3500,
+};
 
-const featureCards = [
-  { title: 'The Lock', body: 'When StillOff activates, the apps that fuel the spiral go quiet.' },
-  { title: 'The Reset', body: 'Breathing, silence, and calm guidance turn your phone into a reset space.' },
-  { title: 'The Soft Landing', body: 'A 15-minute post-session firewall keeps high-dopamine apps quiet after the lock ends.' },
-  { title: 'Learns your patterns', body: 'StillOff steps in before you have to ask.' },
-];
+// ─── Toast ────────────────────────────────────────────────────────────────────
 
-const comparisonRows = [
-  ['Track your usage', 'Stop the behavior'],
-  ['Suggest breaks', 'Intervene in the moment'],
-  ['Rely on your discipline', 'Remove the decision'],
-  ['Easy to bypass', 'Designed to hold'],
-  ['Work when you\'re motivated', 'Work when you\'re not'],
-] as const;
+type ToastItem = { id: number; msg: string };
 
-const testimonials = [
-  { quote: 'It stopped me before I spiraled.', person: 'Early tester' },
-  { quote: 'This is the first thing that actually interrupted me.', person: 'Beta waitlist user' },
-  { quote: "I didn't realize how automatic it had become.", person: 'Pilot user' },
-];
+function Toast({ msg, onDone }: { msg: string; onDone: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 3000);
+    return () => clearTimeout(t);
+  }, [onDone]);
+  return (
+    <m.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 16 }}
+      transition={{ duration: 0.35 }}
+      className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[200] px-5 py-3 rounded-full text-sm font-sans text-[#F3EEE6] bg-[#1C1A17]/90 backdrop-blur-md border border-[#2A2622] shadow-xl whitespace-nowrap"
+    >
+      {msg}
+    </m.div>
+  );
+}
 
-const pricingTiers = [
-  {
-    name: 'Free',
-    price: '$0',
-    cadence: 'forever',
-    annual: null as string | null,
-    features: ['3-min sessions', '1 AI suggestion/week', 'Zen & Break modes', 'Basic streak + journal'],
-    highlight: false,
-    badge: null as string | null,
-  },
-  {
-    name: 'Plus',
-    price: '$5.99',
-    cadence: '/mo',
-    annual: '$47.99/yr — save 33%',
-    features: ['Hard Lock', 'Guided Reset', 'Soft Landing', '3 AI interventions/day', '2 scheduled auto-locks', 'Weekly insight report'],
-    highlight: true,
-    badge: 'Most Popular',
-  },
-  {
-    name: 'Premium',
-    price: '$9.99',
-    cadence: '/mo',
-    annual: '$79.99/yr — save 33%',
-    features: ['Everything in Plus', 'Unlimited AI interventions', 'Hard Lock Mode', 'Letter to My Future Self', 'Post-session App Firewall'],
-    highlight: false,
-    badge: null as string | null,
-  },
-];
-
-const softLandingApps = [
-  { name: 'Phone', quiet: false },
-  { name: 'Maps', quiet: false },
-  { name: 'Notes', quiet: false },
-  { name: 'Instagram', quiet: true },
-  { name: 'TikTok', quiet: true },
-  { name: 'X', quiet: true },
-];
-
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPER COMPONENTS
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── FadeIn ───────────────────────────────────────────────────────────────────
 
 function FadeIn({
   children,
   delay = 0,
-  y = 20,
+  y = 24,
   className = '',
 }: {
   children: React.ReactNode;
@@ -101,12 +58,14 @@ function FadeIn({
   y?: number;
   className?: string;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-80px 0px' });
   return (
     <m.div
+      ref={ref}
       initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.7, delay, ease: [0.4, 0, 0.2, 1] }}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y }}
+      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
       {children}
@@ -114,1097 +73,1048 @@ function FadeIn({
   );
 }
 
-function SectionHeading({
-  eyebrow,
-  title,
-  body,
-}: {
-  eyebrow?: string;
-  title: string;
-  body?: string;
-}) {
+// ─── Phone Screen ─────────────────────────────────────────────────────────────
+
+function PhoneScreen({ phase }: { phase: WalkPhase }) {
+  const [breathLabel, setBreathLabel] = useState<'in' | 'hold' | 'out' | 'hold2'>('in');
+
+  useEffect(() => {
+    if (phase !== 'breathing') return;
+    const cycle: Array<{ label: 'in' | 'hold' | 'out' | 'hold2'; dur: number }> = [
+      { label: 'in', dur: 4000 },
+      { label: 'hold', dur: 2000 },
+      { label: 'out', dur: 4000 },
+      { label: 'hold2', dur: 2000 },
+    ];
+    let idx = 0;
+    let timer: ReturnType<typeof setTimeout>;
+    const next = () => {
+      setBreathLabel(cycle[idx % cycle.length].label);
+      const dur = cycle[idx % cycle.length].dur;
+      idx++;
+      timer = setTimeout(next, dur);
+    };
+    next();
+    return () => clearTimeout(timer);
+  }, [phase]);
+
+  const breathText: Record<typeof breathLabel, string> = {
+    in: 'Breathe in...',
+    hold: 'Hold...',
+    out: 'Breathe out...',
+    hold2: 'Hold...',
+  };
+
   return (
-    <div className="text-center max-w-3xl mx-auto mb-16 px-6">
-      {eyebrow && (
-        <p className="text-xs uppercase tracking-widest text-[#BEB4A7] mb-4">{eyebrow}</p>
-      )}
-      <h2
-        className="font-serif text-4xl md:text-5xl lg:text-6xl font-light text-[#F3EEE6] leading-tight mb-6"
-        style={{ fontFamily: 'var(--font-serif)' }}
-      >
-        {title}
-      </h2>
-      {body && (
-        <p className="text-[#BEB4A7] text-lg leading-7">{body}</p>
-      )}
+    <div className="relative w-full h-full overflow-hidden rounded-[30px] bg-[#0C0B09] flex flex-col">
+      {/* Dynamic Island */}
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-20 h-6 bg-black rounded-full z-10" />
+
+      <AnimatePresence mode="wait">
+        {phase === 'trigger' && (
+          <m.div key="trigger" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="flex-1 flex flex-col justify-between px-4 pt-12 pb-5">
+            <div className="text-center">
+              <p className="text-[10px] text-[#BEB4A7] font-sans tracking-widest uppercase">9:41</p>
+            </div>
+            <div className="grid grid-cols-4 gap-2.5 px-1">
+              {[
+                { name: 'IG', badge: 12, color: '#833AB4' },
+                { name: 'TK', badge: 7, color: '#111' },
+                { name: 'X', badge: 3, color: '#1a1a1a' },
+                { name: 'YT', badge: null, color: '#CC0000' },
+                { name: 'Msg', badge: 2, color: '#34C759' },
+                { name: 'Mail', badge: null, color: '#007AFF' },
+                { name: 'Maps', badge: null, color: '#34AADC' },
+                { name: 'Cam', badge: null, color: '#2C2C2E' },
+              ].map((app) => (
+                <div key={app.name} className="relative flex flex-col items-center gap-1">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+                    style={{ background: app.color }}>
+                    <span className="text-[8px] text-white font-sans font-medium">{app.name}</span>
+                  </div>
+                  {app.badge && (
+                    <m.div animate={{ scale: [1, 1.25, 1] }}
+                      transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
+                      className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                      <span className="text-[7px] text-white font-bold">{app.badge}</span>
+                    </m.div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <m.div animate={{ opacity: [0.6, 1, 0.6] }} transition={{ repeat: Infinity, duration: 2 }}
+              className="mx-1 px-3 py-2 rounded-xl bg-[#1C1917] border border-[#2A2622]">
+              <p className="text-[9px] text-[#6E4637] font-sans font-medium">StillOff detecting...</p>
+              <p className="text-[9px] text-[#BEB4A7] font-sans mt-0.5">Opened 6× in 8 min</p>
+            </m.div>
+          </m.div>
+        )}
+
+        {phase === 'lock' && (
+          <m.div key="lock" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }} className="flex-1 flex flex-col items-center justify-center gap-5 px-6">
+            <m.div initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.25, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="w-12 h-12 rounded-2xl bg-[#6E4637]/20 border border-[#6E4637]/40 flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                <rect x="4.5" y="10" width="13" height="9" rx="2" stroke="#6E4637" strokeWidth="1.4" />
+                <path d="M7.5 10V7a3.5 3.5 0 0 1 7 0v3" stroke="#6E4637" strokeWidth="1.4" strokeLinecap="round" />
+              </svg>
+            </m.div>
+            <div className="text-center space-y-1.5">
+              <p className="font-serif text-base text-[#F3EEE6]">StillOff has stepped in.</p>
+              <p className="text-[10px] text-[#BEB4A7] font-sans">Your apps are quiet.</p>
+            </div>
+            <m.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
+              transition={{ delay: 0.6, duration: 1.4 }}
+              className="w-full h-px bg-gradient-to-r from-transparent via-[#6E4637] to-transparent" />
+          </m.div>
+        )}
+
+        {phase === 'breathing' && (
+          <m.div key="breathing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="flex-1 flex flex-col items-center justify-center gap-5">
+            <BreathingOrb size={100} intense />
+            <div className="text-center">
+              <m.p key={breathLabel} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }} className="font-serif text-sm text-[#F3EEE6]">
+                {breathText[breathLabel]}
+              </m.p>
+              <p className="text-[9px] text-[#BEB4A7] font-sans mt-1 tracking-wider uppercase">Guided Reset</p>
+            </div>
+          </m.div>
+        )}
+
+        {phase === 'complete' && (
+          <m.div key="complete" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }} className="flex-1 flex flex-col items-center justify-center gap-5 px-6">
+            <m.div initial={{ scale: 0 }} animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.2 }}
+              className="w-11 h-11 rounded-full bg-[#6E4637]/20 border border-[#6E4637]/50 flex items-center justify-center">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M3 9l4 4 8-7" stroke="#6E4637" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </m.div>
+            <div className="text-center">
+              <p className="font-serif text-base text-[#F3EEE6]">Session complete.</p>
+              <p className="text-[10px] text-[#BEB4A7] font-sans mt-1">18 min · Day 11 · streak active</p>
+            </div>
+          </m.div>
+        )}
+
+        {phase === 'firewall' && (
+          <m.div key="firewall" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="flex-1 flex flex-col justify-center px-5 pt-12 gap-1">
+            <p className="text-[9px] text-[#BEB4A7] font-sans tracking-widest uppercase mb-3">App Firewall · 15 min</p>
+            {[
+              { name: 'Instagram', quiet: true },
+              { name: 'TikTok', quiet: true },
+              { name: 'X / Twitter', quiet: true },
+              { name: 'Messages', quiet: false },
+              { name: 'Maps', quiet: false },
+            ].map((app, i) => (
+              <m.div key={app.name} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.08 }}
+                className="flex items-center justify-between py-2 border-b border-[#2A2622]/60">
+                <span className="text-[11px] text-[#F3EEE6] font-sans">{app.name}</span>
+                <span className={`text-[9px] font-sans font-medium px-2 py-0.5 rounded-full ${
+                  app.quiet ? 'bg-[#6E4637]/25 text-[#6E4637]' : 'bg-[#2A2622] text-[#BEB4A7]'}`}>
+                  {app.quiet ? 'Quiet' : 'Open'}
+                </span>
+              </m.div>
+            ))}
+          </m.div>
+        )}
+      </AnimatePresence>
+
+      {/* Phase dots */}
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+        {WALK_PHASES.map((p) => (
+          <div key={p} className={`h-1.5 rounded-full transition-all duration-500 ${
+            p === phase ? 'bg-[#6E4637] w-4' : 'bg-[#2A2622] w-1.5'}`} />
+        ))}
+      </div>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DEMO MODAL
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Phone Shell ──────────────────────────────────────────────────────────────
 
-const BREATH_LABELS = ['Breathe in', 'Hold', 'Breathe out', 'Hold'];
-const BREATH_DURATIONS = [4000, 2000, 4000, 2000];
+function PhoneShell({ phase, width = 260, height = 520 }: { phase: WalkPhase; width?: number; height?: number }) {
+  return (
+    <div
+      style={{ width, height }}
+      className="relative rounded-[38px] border border-[#2A2622] bg-[#0C0B09] shadow-[0_40px_80px_rgba(0,0,0,0.6)] flex-shrink-0"
+    >
+      <div className="absolute inset-0 rounded-[38px] border border-[#F3EEE6]/[0.04] pointer-events-none z-20" />
+      <div className="absolute inset-[2px] rounded-[36px] overflow-hidden">
+        <PhoneScreen phase={phase} />
+      </div>
+      <div className="absolute left-[-1px] top-[100px] w-[2px] h-7 bg-[#1C1917] rounded-l" />
+      <div className="absolute left-[-1px] top-[140px] w-[2px] h-7 bg-[#1C1917] rounded-l" />
+      <div className="absolute right-[-1px] top-[118px] w-[2px] h-12 bg-[#1C1917] rounded-r" />
+    </div>
+  );
+}
 
-function DemoModal({
-  onClose,
-  onComplete,
-  onShowToast,
-}: {
-  onClose: () => void;
-  onComplete: () => void;
-  onShowToast: (msg: string) => void;
-}) {
-  type Phase = 'intro' | 'breathing' | 'ending' | 'cta';
-  const [phase, setPhase] = useState<Phase>('intro');
-  const [breathIndex, setBreathIndex] = useState(0);
-  const [email, setEmail] = useState('');
-  const [prefersReduced, setPrefersReduced] = useState(false);
-
+// Self-cycling phone (hero)
+function PhoneWalkthrough({ width = 260, height = 520 }: { width?: number; height?: number }) {
+  const [phaseIdx, setPhaseIdx] = useState(0);
+  const phase = WALK_PHASES[phaseIdx];
   useEffect(() => {
-    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReduced(mql.matches);
+    const t = setTimeout(() => setPhaseIdx((i) => (i + 1) % WALK_PHASES.length), PHASE_DURATIONS[phase]);
+    return () => clearTimeout(t);
+  }, [phaseIdx, phase]);
+  return <PhoneShell phase={phase} width={width} height={height} />;
+}
+
+// ─── Demo Modal ───────────────────────────────────────────────────────────────
+
+type DemoPhase = 'preframe' | 'breathing' | 'ending' | 'cta';
+
+function DemoModal({ onClose, showToast }: { onClose: () => void; showToast: (msg: string) => void }) {
+  const [phase, setPhase] = useState<DemoPhase>('preframe');
+  const [breathLabel, setBreathLabel] = useState<'in' | 'hold' | 'out' | 'hold2'>('in');
+  const [progress, setProgress] = useState(0);
+  const [email, setEmail] = useState('');
+  const [sending, setSending] = useState(false);
+
+  // Preframe → breathing
+  useEffect(() => {
+    const t = setTimeout(() => setPhase('breathing'), 2800);
+    return () => clearTimeout(t);
   }, []);
 
-  const breathingMs = prefersReduced ? 5000 : 30000;
-
-  // Phase progression
-  useEffect(() => {
-    if (phase === 'intro') {
-      const t = setTimeout(() => setPhase('breathing'), 1200);
-      return () => clearTimeout(t);
-    }
-    if (phase === 'breathing') {
-      const t = setTimeout(() => setPhase('ending'), breathingMs);
-      return () => clearTimeout(t);
-    }
-    if (phase === 'ending') {
-      const t = setTimeout(() => setPhase('cta'), 3200);
-      return () => clearTimeout(t);
-    }
-  }, [phase, breathingMs]);
-
-  // Breath label cycling
+  // Breathing cycle + progress
   useEffect(() => {
     if (phase !== 'breathing') return;
-    const t = setTimeout(() => {
-      setBreathIndex((i) => (i + 1) % BREATH_LABELS.length);
-    }, BREATH_DURATIONS[breathIndex]);
-    return () => clearTimeout(t);
-  }, [phase, breathIndex]);
-
-  // Lock body scroll
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = '';
+    const cycle: Array<{ label: 'in' | 'hold' | 'out' | 'hold2'; dur: number }> = [
+      { label: 'in', dur: 4000 },
+      { label: 'hold', dur: 2000 },
+      { label: 'out', dur: 4000 },
+      { label: 'hold2', dur: 2000 },
+    ];
+    let idx = 0;
+    let labelTimer: ReturnType<typeof setTimeout>;
+    const nextLabel = () => {
+      setBreathLabel(cycle[idx % cycle.length].label);
+      const dur = cycle[idx % cycle.length].dur;
+      idx++;
+      labelTimer = setTimeout(nextLabel, dur);
     };
-  }, []);
+    nextLabel();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const start = performance.now();
+    const progressTimer = setInterval(() => {
+      const p = Math.min((performance.now() - start) / 30000, 1);
+      setProgress(p);
+      if (p >= 1) {
+        clearInterval(progressTimer);
+        clearTimeout(labelTimer);
+        setPhase('ending');
+      }
+    }, 80);
+
+    return () => {
+      clearInterval(progressTimer);
+      clearTimeout(labelTimer);
+    };
+  }, [phase]);
+
+  // Ending → CTA
+  useEffect(() => {
+    if (phase !== 'ending') return;
+    const t = setTimeout(() => setPhase('cta'), 2600);
+    return () => clearTimeout(t);
+  }, [phase]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email) return;
+    setSending(true);
     try {
-      await fetch('https://formspree.io/f/mzdklnwv', {
+      const res = await fetch('https://formspree.io/f/mzdklnwv', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, _subject: 'StillOff waitlist signup' }),
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ email, source: 'demo-modal' }),
       });
-      onShowToast("You're on the list. See you on the other side.");
-      setEmail('');
-      onComplete();
+      if (res.ok) {
+        sessionStorage.setItem('stilloff-demo-complete', 'true');
+        showToast("You're on the list. See you on the other side.");
+        onClose();
+      } else {
+        showToast('Something went wrong. Try again.');
+      }
     } catch {
-      onShowToast('Something went wrong. Try again.');
+      showToast('Something went wrong. Try again.');
+    } finally {
+      setSending(false);
     }
   };
 
-  const phaseVariants = {
-    initial: { opacity: 0, y: 12 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -12 },
+  const breathText: Record<typeof breathLabel, string> = {
+    in: 'Breathe in',
+    hold: 'Hold',
+    out: 'Breathe out',
+    hold2: 'Hold',
   };
 
   return (
-    <m.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(7,6,5,0.95)' }}
-    >
-      <button
-        onClick={onClose}
-        className="absolute top-6 right-6 text-[#BEB4A7] text-xl leading-none hover:text-[#F3EEE6] transition-colors w-10 h-10 flex items-center justify-center"
-        aria-label="Close"
-      >
-        ✕
-      </button>
+    <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-[#11100E]/96 backdrop-blur-lg"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <m.div initial={{ scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.94, opacity: 0 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className="relative w-full max-w-sm mx-5 rounded-3xl bg-[#0F0E0C] border border-[#2A2622] overflow-hidden">
+        <button onClick={onClose}
+          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-[#1C1917] flex items-center justify-center text-[#BEB4A7] hover:text-[#F3EEE6] transition-colors">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+            <path d="M1 1l9 9M10 1L1 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </button>
 
-      <div className="w-full max-w-sm mx-auto px-8 text-center">
-        <AnimatePresence mode="wait">
-          {phase === 'intro' && (
-            <m.div
-              key="intro"
-              variants={phaseVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.5 }}
-              className="space-y-6"
-            >
-              <p className="text-xs uppercase tracking-widest text-[#BEB4A7]">
-                Lock starting...
-              </p>
-              <h2
-                className="font-serif text-3xl font-light text-[#F3EEE6] leading-snug"
-                style={{ fontFamily: 'var(--font-serif)' }}
-              >
-                For the next minute, your phone becomes a reset space.
-              </h2>
-            </m.div>
-          )}
+        <div className="p-8 min-h-[460px] flex flex-col items-center justify-center">
+          <AnimatePresence mode="wait">
+            {phase === 'preframe' && (
+              <m.div key="preframe" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }} className="text-center space-y-2">
+                <p className="font-serif text-2xl text-[#F3EEE6] leading-snug">
+                  "You didn't plan to scroll.
+                </p>
+                <p className="font-serif text-2xl text-[#6E4637] italic leading-snug">
+                  StillOff stepped in."
+                </p>
+                <p className="text-xs text-[#BEB4A7] font-sans mt-6 pt-4">Starting your reset...</p>
+              </m.div>
+            )}
 
-          {phase === 'breathing' && (
-            <m.div
-              key="breathing"
-              variants={phaseVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.5 }}
-              className="flex flex-col items-center gap-12"
-            >
-              <BreathingOrb size={260} intense={true} />
-              <AnimatePresence mode="wait">
-                <m.p
-                  key={breathIndex}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="text-[#BEB4A7] text-lg font-light tracking-widest"
-                >
-                  {BREATH_LABELS[breathIndex]}
+            {phase === 'breathing' && (
+              <m.div key="breathing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex flex-col items-center gap-8 w-full">
+                <BreathingOrb size={180} intense />
+                <m.p key={breathLabel} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }} className="font-serif text-2xl text-[#F3EEE6]">
+                  {breathText[breathLabel]}
                 </m.p>
-              </AnimatePresence>
-            </m.div>
-          )}
+                <div className="w-full h-px bg-[#2A2622] rounded-full overflow-hidden">
+                  <div className="h-full bg-[#6E4637] transition-all duration-75 ease-linear"
+                    style={{ width: `${progress * 100}%` }} />
+                </div>
+              </m.div>
+            )}
 
-          {phase === 'ending' && (
-            <m.div
-              key="ending"
-              variants={phaseVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.5 }}
-              className="space-y-8"
-            >
-              {["You didn't check.", 'Nothing happened.', "That's the point."].map((line, i) => (
-                <m.p
-                  key={line}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.7, duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-                  className="font-serif font-light leading-tight"
-                  style={{
-                    fontFamily: 'var(--font-serif)',
-                    fontSize: i === 0 ? '2.5rem' : i === 1 ? '1.75rem' : '1.4rem',
-                    color: i === 0 ? '#F3EEE6' : i === 1 ? '#BEB4A7' : 'rgba(190,180,167,0.5)',
-                  }}
-                >
-                  {line}
-                </m.p>
-              ))}
-            </m.div>
-          )}
+            {phase === 'ending' && (
+              <m.div key="ending" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }} className="text-center space-y-2">
+                <p className="font-serif text-xl text-[#F3EEE6] leading-relaxed">
+                  You didn't check. Nothing happened.
+                </p>
+                <p className="font-serif text-xl text-[#6E4637] italic">That's the point.</p>
+              </m.div>
+            )}
 
-          {phase === 'cta' && (
-            <m.div
-              key="cta"
-              variants={phaseVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.6, delay: 1.4 }}
-              className="space-y-6"
-            >
-              <h2
-                className="font-serif text-4xl font-light text-[#F3EEE6]"
-                style={{ fontFamily: 'var(--font-serif)' }}
-              >
-                That felt different.
-              </h2>
-              <p className="text-[#BEB4A7] text-lg">That&apos;s what control feels like.</p>
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-4">
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email"
-                  className="w-full bg-[#1A1815] border border-[#2A2622] text-[#F3EEE6] placeholder-[#6B6560] rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-[#BEB4A7] transition-colors"
-                />
-                <button
-                  type="submit"
-                  className="w-full bg-[#F3EEE6] text-[#11100E] rounded-full py-4 font-medium text-base hover:bg-white transition-colors"
-                >
-                  I&apos;m in
-                </button>
-              </form>
-              <p className="text-[#6B6560] text-sm">No newsletters. One email when it&apos;s ready.</p>
-            </m.div>
-          )}
-        </AnimatePresence>
-      </div>
+            {phase === 'cta' && (
+              <m.div key="cta" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                className="w-full text-center">
+                <p className="font-serif text-xl text-[#F3EEE6] mb-1">That felt different.</p>
+                <p className="text-sm text-[#BEB4A7] font-sans mb-8">Be first when StillOff launches.</p>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    className="w-full px-4 py-3 rounded-xl bg-[#1C1917] border border-[#2A2622] text-[#F3EEE6] text-sm font-sans placeholder-[#BEB4A7]/40 focus:outline-none focus:border-[#6E4637] transition-colors" />
+                  <button type="submit" disabled={sending}
+                    className="w-full py-3 rounded-xl bg-[#6E4637] text-[#F3EEE6] text-sm font-sans font-medium hover:bg-[#7D5040] transition-colors disabled:opacity-50">
+                    {sending ? 'Joining...' : 'Join the waitlist'}
+                  </button>
+                </form>
+                <p className="text-[11px] text-[#BEB4A7]/50 font-sans mt-4">No newsletters. One email when it's ready.</p>
+              </m.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </m.div>
     </m.div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN PAGE
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Hero ─────────────────────────────────────────────────────────────────────
 
-export default function Home() {
-  const [demoOpen, setDemoOpen] = useState(false);
-  const [demoCompleted, setDemoCompleted] = useState(false);
-  const [showSticky, setShowSticky] = useState(false);
-  const [pulseFast, setPulseFast] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-
-  const waitlistRef = useRef<HTMLElement>(null);
+function Hero({ onOpenDemo }: { onOpenDemo: () => void }) {
+  const [grainOpacity, setGrainOpacity] = useState(0.04);
+  const [supportLine, setSupportLine] = useState('Break the loop before it owns the next hour.');
   const lastScrollY = useRef(0);
-  const lastScrollTime = useRef(Date.now());
+  const lastScrollTime = useRef(0);
 
-  // Check sessionStorage on mount
   useEffect(() => {
-    try {
-      setDemoCompleted(sessionStorage.getItem('stilloff-demo-complete') === 'true');
-    } catch {
-      setDemoCompleted(false);
+    lastScrollTime.current = performance.now();
+    if (sessionStorage.getItem('stilloff-demo-complete') === 'true') {
+      setSupportLine('Welcome back. Ready to lock it in?');
     }
   }, []);
 
-  // Scroll tracking
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const pageHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = pageHeight > 0 ? scrollY / pageHeight : 0;
-
-      let nearWaitlist = false;
-      if (waitlistRef.current) {
-        const rect = waitlistRef.current.getBoundingClientRect();
-        nearWaitlist = rect.top < window.innerHeight * 0.85;
-      }
-
-      setShowSticky(progress > 0.2 && !nearWaitlist);
-
-      const now = Date.now();
+    const onScroll = () => {
+      const now = performance.now();
+      const delta = Math.abs(window.scrollY - lastScrollY.current);
       const dt = now - lastScrollTime.current;
-      if (dt > 0) {
-        const velocity = Math.abs(scrollY - lastScrollY.current) / dt;
-        setPulseFast(velocity > 1.2);
-      }
-      lastScrollY.current = scrollY;
+      const velocity = dt > 0 ? delta / dt : 0;
+      setGrainOpacity(velocity > 1.8 ? 0.06 : 0.04);
+      lastScrollY.current = window.scrollY;
       lastScrollTime.current = now;
     };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  // Toast auto-dismiss
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 3000);
-    return () => clearTimeout(t);
-  }, [toast]);
-
-  const showToast = useCallback((msg: string) => setToast(msg), []);
-
-  const openDemo = useCallback(() => {
-    setTimeout(() => setDemoOpen(true), 120);
-  }, []);
-
-  const handleDemoComplete = useCallback(() => {
-    try {
-      sessionStorage.setItem('stilloff-demo-complete', 'true');
-    } catch {}
-    setDemoCompleted(true);
-    setDemoOpen(false);
-  }, []);
-
-  const handleWaitlistSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const emailInput = form.elements.namedItem('email') as HTMLInputElement | null;
-    try {
-      await fetch('https://formspree.io/f/mzdklnwv', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: emailInput?.value,
-          _subject: 'StillOff waitlist signup',
-        }),
-      });
-      showToast("You're on the list. See you on the other side.");
-      form.reset();
-    } catch {
-      showToast('Something went wrong. Try again.');
-    }
-  };
-
-  const handleShare = async () => {
-    const text = "I sat with the loop for 12 minutes today. I didn't look away.";
-    const url = window.location.href;
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: 'StillOff', text, url });
-        return;
-      }
-      await navigator.clipboard.writeText(text + ' ' + url);
-      showToast('Copied to clipboard.');
-    } catch {
-      showToast('Sharing is not available here.');
-    }
-  };
-
-  const grainOpacity = pulseFast ? 0.06 : 0.04;
 
   return (
-    <LazyMotion features={domAnimation}>
-      {/* ── Toast ─────────────────────────────────────────────── */}
-      <AnimatePresence>
-        {toast && (
-          <m.div
-            key="toast"
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 14 }}
-            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[200] bg-[#1A1815] border border-white/10 backdrop-blur-sm text-[#F3EEE6] text-sm px-6 py-3 rounded-full shadow-xl whitespace-nowrap"
-          >
-            {toast}
-          </m.div>
-        )}
-      </AnimatePresence>
+    <section className="relative min-h-[108vh] flex items-center overflow-hidden pt-24 pb-24">
+      {/* Grain overlay */}
+      <div className="absolute inset-0 pointer-events-none z-10 transition-opacity duration-700"
+        style={{
+          opacity: grainOpacity,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+          backgroundSize: '160px 160px',
+        }} />
+      {/* Background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-[#6E4637]/[0.07] blur-[140px] pointer-events-none" />
 
-      {/* ── Demo Modal ────────────────────────────────────────── */}
-      <AnimatePresence>
-        {demoOpen && (
-          <DemoModal
-            key="demo"
-            onClose={() => setDemoOpen(false)}
-            onComplete={handleDemoComplete}
-            onShowToast={showToast}
-          />
-        )}
-      </AnimatePresence>
+      <div className="relative z-[2] w-full max-w-7xl mx-auto px-6 lg:px-16">
+        <div className="grid lg:grid-cols-2 gap-20 items-center">
+          {/* Copy */}
+          <div>
+            <m.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-[11px] font-sans tracking-[0.22em] uppercase text-[#6E4637] mb-7">
+              Real-time intervention
+            </m.p>
+            <m.h1 initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="font-serif text-5xl sm:text-6xl lg:text-[5.2rem] text-[#F3EEE6] leading-[1.06] mb-7">
+              When discipline disappears, StillOff steps in.
+            </m.h1>
+            <m.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.4 }}
+              className="font-serif text-xl italic text-[#BEB4A7] mb-4 leading-relaxed">
+              {supportLine}
+            </m.p>
+            <m.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.52 }}
+              className="text-sm text-[#BEB4A7] font-sans leading-loose mb-11 max-w-md">
+              StillOff detects and interrupts compulsive phone behavior in real time, locking your device into a guided reset before the loop deepens.
+            </m.p>
+            <m.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.66 }}
+              className="flex flex-wrap gap-4">
+              <a href="#waitlist"
+                className="px-7 py-3.5 rounded-full bg-[#6E4637] text-[#F3EEE6] text-sm font-sans font-medium hover:bg-[#7D5040] transition-colors">
+                Join Waitlist
+              </a>
+              <button onClick={() => setTimeout(onOpenDemo, 120)}
+                className="px-7 py-3.5 rounded-full border border-[#2A2622] text-[#BEB4A7] text-sm font-sans hover:border-[#6E4637]/60 hover:text-[#F3EEE6] transition-all">
+                Watch 60-sec demo
+              </button>
+            </m.div>
+          </div>
 
-      {/* ── Sticky CTA ────────────────────────────────────────── */}
-      <AnimatePresence>
-        {showSticky && !demoOpen && (
-          <m.div
-            key="sticky"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.88 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className="fixed bottom-6 right-4 md:right-auto md:left-6 z-50"
-          >
-            <button
-              onClick={openDemo}
-              className="bg-[#1A1815] border border-[#2A2622] text-[#F3EEE6] text-sm px-5 py-3 rounded-full backdrop-blur-sm hover:border-[#BEB4A7] transition-colors shadow-lg"
-            >
-              Lock it now
-            </button>
-          </m.div>
-        )}
-      </AnimatePresence>
-
-      <main>
-        {/* ──────────────────────────────────────────────────────
-            SECTION 1: HERO
-        ────────────────────────────────────────────────────── */}
-        <section className="min-h-screen relative overflow-hidden flex items-center">
-          <div
-            className="absolute inset-0 pointer-events-none z-10"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-              opacity: grainOpacity,
-              mixBlendMode: 'overlay',
-            }}
-          />
-
-          <div className="container mx-auto px-6 max-w-7xl grid lg:grid-cols-2 gap-16 items-center py-28 lg:py-36 relative z-20">
-            {/* Left: text */}
-            <div>
-              <m.p
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1, ease: [0.4, 0, 0.2, 1] }}
-                className="text-xs uppercase tracking-widest text-[#BEB4A7] mb-8"
-              >
-                You picked up your phone 84 times today.
-              </m.p>
-
-              <m.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
-                className="font-serif text-5xl md:text-6xl lg:text-7xl font-light text-[#F3EEE6] leading-tight mb-8"
-                style={{ fontFamily: 'var(--font-serif)' }}
-              >
-                {demoCompleted
-                  ? 'Welcome back. Ready to lock it in?'
-                  : "When you can't stop, StillOff does."}
-              </m.h1>
-
-              <m.p
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                className="text-[#BEB4A7] text-xl leading-8 mb-12 max-w-lg"
-              >
-                A real-time intervention that steps in before the spiral takes over.
-              </m.p>
-
-              <m.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.5, ease: [0.4, 0, 0.2, 1] }}
-                className="flex flex-col sm:flex-row gap-4"
-              >
-                <button
-                  onClick={openDemo}
-                  className="bg-[#F3EEE6] text-[#11100E] px-8 py-4 rounded-full font-medium text-base hover:bg-white transition-colors"
-                >
-                  Try the 60-second lock
-                </button>
-                <button
-                  onClick={() =>
-                    document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })
-                  }
-                  className="border border-[#2A2622] text-[#F3EEE6] px-8 py-4 rounded-full font-medium text-base hover:border-[#BEB4A7] transition-colors"
-                >
-                  See how it works
-                </button>
-              </m.div>
+          {/* Phone + ambient cards */}
+          <m.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.1, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            className="relative flex justify-center items-center min-h-[560px]">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-50 pointer-events-none">
+              <BreathingOrb size={340} />
             </div>
+            <PhoneWalkthrough width={260} height={520} />
+            {/* Ambient card left */}
+            <m.div animate={{ y: [0, -9, 0] }} transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="hidden lg:block absolute left-[-60px] top-[22%] max-w-[172px] p-3.5 rounded-2xl bg-[#1C1917]/85 border border-[#2A2622] backdrop-blur-sm shadow-xl">
+              <p className="text-[10px] text-[#6E4637] font-sans font-medium mb-1">Pattern detected</p>
+              <p className="text-[10px] text-[#BEB4A7] font-sans leading-snug">Opened 6 times in the last 8 minutes</p>
+            </m.div>
+            {/* Ambient card right */}
+            <m.div animate={{ y: [0, 9, 0] }} transition={{ duration: 5.8, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
+              className="hidden lg:block absolute right-[-48px] bottom-[22%] max-w-[172px] p-3.5 rounded-2xl bg-[#1C1917]/85 border border-[#2A2622] backdrop-blur-sm shadow-xl">
+              <p className="text-[10px] text-[#6E4637] font-sans font-medium mb-1">Session complete</p>
+              <p className="text-[10px] text-[#BEB4A7] font-sans leading-snug">18 min · Day 11</p>
+            </m.div>
+          </m.div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
-            {/* Right: phone mockup */}
-            <div className="relative flex items-center justify-center">
-              {/* Ambient glow */}
-              <div className="absolute inset-[-20%] bg-[#6E4637]/8 rounded-full blur-3xl" />
+// ─── The Loop ─────────────────────────────────────────────────────────────────
 
-              {/* Phone frame */}
-              <m.div
-                animate={{ y: [0, -12, 0] }}
-                transition={{ duration: 5.2, repeat: Infinity, ease: 'easeInOut' }}
-                className="relative"
-              >
-                <div
-                  className="relative overflow-hidden shadow-2xl"
-                  style={{
-                    width: 260,
-                    height: 520,
-                    borderRadius: 40,
-                    background: '#0D0C0B',
-                    border: '1px solid rgba(42,38,34,0.8)',
-                    boxShadow: '0 0 60px rgba(110,70,55,0.12), 0 40px 80px rgba(0,0,0,0.6)',
-                  }}
-                >
-                  {/* Status bar simulation */}
-                  <div className="absolute top-0 left-0 right-0 h-12 flex items-center justify-between px-6 pt-2">
-                    <span className="text-[#F3EEE6]/20 text-xs">9:41</span>
-                    <div className="w-20 h-5 bg-[#11100E] rounded-full" />
-                    <div className="flex gap-1">
-                      {[...Array(3)].map((_, i) => (
-                        <div key={i} className="w-1 h-3 bg-[#F3EEE6]/20 rounded-sm" />
-                      ))}
-                    </div>
+const LOOP_LINES = [
+  { text: "You weren't going to scroll.", color: 'text-[#BEB4A7]', size: 'text-3xl sm:text-4xl lg:text-[2.6rem]', italic: false },
+  { text: 'You checked one thing.', color: 'text-[#BEB4A7]', size: 'text-3xl sm:text-4xl lg:text-[2.6rem]', italic: false },
+  { text: 'You stayed longer than you meant to.', color: 'text-[#C8C0B5]', size: 'text-3xl sm:text-4xl lg:text-[2.8rem]', italic: false },
+  { text: 'You felt worse and kept going.', color: 'text-[#D4CCC4]', size: 'text-3xl sm:text-4xl lg:text-[2.8rem]', italic: false },
+  { text: "The problem isn't awareness.", color: 'text-[#E4DDD5]', size: 'text-3xl sm:text-4xl lg:text-5xl', italic: false },
+  { text: "It's the moment awareness loses.", color: 'text-[#6E4637]', size: 'text-3xl sm:text-4xl lg:text-5xl', italic: true },
+];
+
+function LoopLine({ line, index }: { line: typeof LOOP_LINES[number]; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-120px 0px' });
+  return (
+    <m.div ref={ref} initial={{ opacity: 0, y: 36 }}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
+      transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: index * 0.05 }}
+      className="py-8 border-b border-[#2A2622]/30 text-center last:border-b-0">
+      <p className={`font-serif leading-tight ${line.size} ${line.color} ${line.italic ? 'italic' : ''}`}>
+        {line.text}
+      </p>
+    </m.div>
+  );
+}
+
+function TheLoop() {
+  return (
+    <section className="relative py-36 px-6">
+      <div className="max-w-3xl mx-auto">
+        {LOOP_LINES.map((line, i) => (
+          <LoopLine key={i} line={line} index={i} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ─── Category Shift ───────────────────────────────────────────────────────────
+
+const CONTRAST_BLOCKS = [
+  "Screen time trackers measure the damage after it happens.",
+  "Blockers rely on the willpower you've already lost.",
+  "Meditation apps only work when you choose them.",
+];
+
+function CategoryShift() {
+  return (
+    <section className="py-32 px-6 border-t border-[#2A2622]">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-20">
+          {CONTRAST_BLOCKS.map((text, i) => (
+            <FadeIn key={i} delay={i * 0.14} y={20}>
+              <div className="py-8 border-b border-[#2A2622] flex items-start gap-6">
+                <span className="text-[#2A2622] font-sans text-xs mt-2 shrink-0 w-6">0{i + 1}</span>
+                <p className="font-serif text-xl sm:text-2xl lg:text-3xl text-[#BEB4A7] leading-snug">{text}</p>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+        <FadeIn delay={0.45} y={32}>
+          <div className="text-center pt-4">
+            <p className="font-serif text-3xl sm:text-4xl lg:text-5xl text-[#F3EEE6] leading-tight max-w-3xl mx-auto">
+              StillOff intervenes in the exact moment{' '}
+              <span className="italic text-[#6E4637]">control starts slipping.</span>
+            </p>
+          </div>
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
+// ─── How It Works ─────────────────────────────────────────────────────────────
+
+const HOW_STEPS = [
+  {
+    n: '01', title: 'Detection', copy: 'StillOff reads the pattern before you notice it.',
+    icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <circle cx="9" cy="9" r="6" stroke="#6E4637" strokeWidth="1.3" />
+      <circle cx="9" cy="9" r="2.5" fill="#6E4637" />
+      <path d="M9 1.5v1.5M9 15v1.5M1.5 9H3M15 9h1.5" stroke="#6E4637" strokeWidth="1.3" strokeLinecap="round" />
+    </svg>,
+  },
+  {
+    n: '02', title: 'Lock', copy: 'The apps that pull you under go quiet.',
+    icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <rect x="3.5" y="8.5" width="11" height="8" rx="2" stroke="#6E4637" strokeWidth="1.3" />
+      <path d="M6.5 8.5V5.5a2.5 2.5 0 0 1 5 0v3" stroke="#6E4637" strokeWidth="1.3" strokeLinecap="round" />
+    </svg>,
+  },
+  {
+    n: '03', title: 'Guided Reset', copy: 'Your phone becomes a breathing space.',
+    icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <circle cx="9" cy="9" r="6" stroke="#6E4637" strokeWidth="1.3" />
+      <circle cx="9" cy="9" r="3" stroke="#6E4637" strokeWidth="1.3" strokeDasharray="1.8 1.8" />
+    </svg>,
+  },
+  {
+    n: '04', title: 'Soft Landing', copy: 'High-dopamine apps stay quiet for 15 minutes after.',
+    icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M9 3v9m0 0-3-3m3 3 3-3" stroke="#6E4637" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M2.5 14.5h13" stroke="#6E4637" strokeWidth="1.3" strokeLinecap="round" />
+    </svg>,
+  },
+  {
+    n: '05', title: 'Pattern Learning', copy: 'Every session makes the next intervention smarter.',
+    icon: <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M2 13l4-5 4 3 6-7" stroke="#6E4637" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="16" cy="4" r="1.75" fill="#6E4637" />
+    </svg>,
+  },
+];
+
+function HowItWorks() {
+  return (
+    <section className="py-32 px-6 border-t border-[#2A2622]">
+      <div className="max-w-4xl mx-auto">
+        <FadeIn>
+          <p className="text-[11px] font-sans tracking-[0.22em] uppercase text-[#6E4637] mb-4">The system</p>
+          <h2 className="font-serif text-4xl sm:text-5xl text-[#F3EEE6] mb-16">How it works.</h2>
+        </FadeIn>
+        <div>
+          {HOW_STEPS.map((step, i) => (
+            <FadeIn key={step.n} delay={i * 0.1} y={18}>
+              <div className="grid grid-cols-[52px_1fr] gap-5 py-8 border-b border-[#2A2622] last:border-b-0">
+                <div className="flex flex-col items-center gap-2 pt-0.5">
+                  <div className="w-9 h-9 rounded-xl bg-[#1C1917] border border-[#2A2622] flex items-center justify-center">
+                    {step.icon}
                   </div>
-                  {/* Orb */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <BreathingOrb size={160} intense={false} />
-                  </div>
-                  {/* Bottom home indicator */}
-                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-20 h-1 bg-[#F3EEE6]/15 rounded-full" />
                 </div>
-
-                {/* Floating cards — desktop only */}
-                <m.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.2, duration: 0.8 }}
-                  className="absolute -left-36 top-16 hidden lg:block"
-                >
-                  <div className="bg-[#1A1815] border border-[#2A2622] rounded-2xl px-5 py-4 min-w-[160px]">
-                    <p className="text-[#BEB4A7] text-xs font-light mb-1">Opened 7 times</p>
-                    <p className="text-[#4A4440] text-xs font-light">in the last few minutes</p>
+                <div>
+                  <div className="flex items-center gap-3 mb-1.5">
+                    <span className="text-[10px] text-[#6E4637] font-sans tracking-wider">{step.n}</span>
+                    <h3 className="font-serif text-xl text-[#F3EEE6]">{step.title}</h3>
                   </div>
-                </m.div>
-
-                <m.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.5, duration: 0.8 }}
-                  className="absolute -right-36 bottom-20 hidden lg:block"
-                >
-                  <div className="bg-[#F3EEE6] rounded-2xl px-5 py-4 min-w-[120px]">
-                    <p className="text-[#11100E] font-medium text-2xl leading-tight">18 min</p>
-                    <p className="text-[#6B6560] text-xs mt-1">Day 11 🌿</p>
-                  </div>
-                </m.div>
-              </m.div>
-            </div>
-          </div>
-        </section>
-
-        {/* ──────────────────────────────────────────────────────
-            SECTION 2: THE LOOP
-        ────────────────────────────────────────────────────── */}
-        <section className="py-32 border-t border-[#2A2622]">
-          <div className="container mx-auto px-6 max-w-3xl">
-            <FadeIn className="mb-16">
-              <p className="text-xs uppercase tracking-widest text-[#BEB4A7] mb-6">The loop</p>
-              <p className="text-[#BEB4A7] text-lg leading-7 max-w-xl">
-                StillOff interrupts compulsive phone use in real time by locking your phone into a
-                guided reset before the loop takes over.
-              </p>
+                  <p className="text-sm text-[#BEB4A7] font-sans leading-relaxed">{step.copy}</p>
+                </div>
+              </div>
             </FadeIn>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-            <div className="flex flex-col">
-              {loopLines.map((line, i) => {
-                const isLarge = i < 5;
-                return (
-                  <m.div
-                    key={line}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.6, delay: i * 0.09, ease: [0.4, 0, 0.2, 1] }}
-                  >
-                    <div
-                      className={`py-5 ${i > 0 ? 'border-t border-white/[0.06]' : ''}`}
-                    >
-                      <p
-                        style={{ fontFamily: isLarge ? 'var(--font-serif)' : undefined }}
-                        className={
-                          isLarge
-                            ? 'font-serif font-light text-[#F3EEE6] text-3xl md:text-4xl'
-                            : 'text-[#BEB4A7] text-base md:text-lg font-light'
-                        }
-                      >
-                        {line}
+// ─── Product Demo Section ─────────────────────────────────────────────────────
+
+const DEMO_STEPS: Array<{ phase: WalkPhase; label: string; sub: string }> = [
+  { phase: 'trigger', label: 'Trigger detected', sub: 'Pattern recognized in real time' },
+  { phase: 'lock', label: 'Lock engages', sub: 'Apps go quiet before you open them' },
+  { phase: 'breathing', label: 'Reset begins', sub: 'Guided breath cycle activates' },
+  { phase: 'complete', label: 'Session complete', sub: '18 min · streak maintained' },
+  { phase: 'firewall', label: 'Firewall active', sub: 'Post-session protection window' },
+];
+
+function ProductDemo() {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const activePhase = DEMO_STEPS[activeIdx].phase;
+
+  useEffect(() => {
+    const t = setTimeout(() => setActiveIdx((i) => (i + 1) % DEMO_STEPS.length), PHASE_DURATIONS[activePhase]);
+    return () => clearTimeout(t);
+  }, [activeIdx, activePhase]);
+
+  return (
+    <section className="py-32 px-6 border-t border-[#2A2622]">
+      <div className="max-w-5xl mx-auto">
+        <FadeIn>
+          <p className="text-[11px] font-sans tracking-[0.22em] uppercase text-[#6E4637] mb-4">Live system</p>
+          <h2 className="font-serif text-4xl sm:text-5xl text-[#F3EEE6] mb-16">See it happen.</h2>
+        </FadeIn>
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <FadeIn delay={0.15} className="flex justify-center">
+            <PhoneShell phase={activePhase} width={260} height={520} />
+          </FadeIn>
+          <div>
+            {DEMO_STEPS.map((step, i) => (
+              <FadeIn key={step.label} delay={i * 0.08} y={14}>
+                <button onClick={() => setActiveIdx(i)} className="w-full text-left">
+                  <div className="py-5 border-b border-[#2A2622] flex items-start gap-5">
+                    <div className={`mt-2 w-2 h-2 rounded-full shrink-0 transition-all duration-500 ${
+                      activeIdx === i ? 'bg-[#6E4637] scale-125' : 'bg-[#2A2622]'}`} />
+                    <div>
+                      <p className={`font-serif text-lg transition-colors duration-300 ${
+                        activeIdx === i ? 'text-[#F3EEE6]' : 'text-[#BEB4A7]'}`}>
+                        {step.label}
                       </p>
+                      <p className="text-xs text-[#BEB4A7]/50 font-sans mt-0.5">{step.sub}</p>
                     </div>
-                  </m.div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* ──────────────────────────────────────────────────────
-            SECTION 3: ALMOST-ACTION MOMENT
-        ────────────────────────────────────────────────────── */}
-        <section className="py-32 border-t border-[#2A2622]">
-          <div className="container mx-auto px-6 max-w-6xl">
-            <FadeIn>
-              <SectionHeading
-                title="There's always a moment right before it happens."
-                body="StillOff is built for the exact second control starts slipping."
-              />
-            </FadeIn>
-
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              {triggerScenarios.map((scenario, i) => (
-                <FadeIn key={scenario.title} delay={i * 0.1}>
-                  <div className="bg-[#141210] border border-[#2A2622] rounded-3xl p-8 h-full">
-                    <p className="text-xs uppercase tracking-widest text-[#BEB4A7] mb-5">
-                      {scenario.title}
-                    </p>
-                    <p
-                      className="font-serif font-light italic text-[#F3EEE6] text-2xl leading-snug"
-                      style={{ fontFamily: 'var(--font-serif)' }}
-                    >
-                      &ldquo;{scenario.body}&rdquo;
-                    </p>
                   </div>
-                </FadeIn>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ──────────────────────────────────────────────────────
-            SECTION 4: PRODUCT CLARITY
-        ────────────────────────────────────────────────────── */}
-        <section className="py-32 border-t border-[#2A2622]">
-          <div className="container mx-auto px-6 max-w-6xl">
-            <FadeIn>
-              <SectionHeading
-                title="StillOff interrupts compulsive phone use in real time."
-                body="Your phone becomes a guided reset before the loop takes over."
-              />
-            </FadeIn>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featureCards.map((card, i) => (
-                <FadeIn key={card.title} delay={i * 0.1}>
-                  <div className="bg-[#141210] border border-[#2A2622] rounded-3xl p-8 h-full">
-                    <h3
-                      className="font-serif font-light text-[#F3EEE6] text-2xl mb-4"
-                      style={{ fontFamily: 'var(--font-serif)' }}
-                    >
-                      {card.title}
-                    </h3>
-                    <p className="text-[#BEB4A7] text-base leading-6 font-light">{card.body}</p>
-                  </div>
-                </FadeIn>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ──────────────────────────────────────────────────────
-            SECTION 5: HOW IT WORKS
-        ────────────────────────────────────────────────────── */}
-        <section id="how-it-works" className="py-32 border-t border-[#2A2622]">
-          <div className="container mx-auto px-6 max-w-5xl">
-            <FadeIn>
-              <SectionHeading title="A simpler way to break the loop." />
-            </FadeIn>
-
-            <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-              {[
-                'You feel the pull',
-                'StillOff steps in',
-                'Your phone becomes a reset space',
-                'You come back with more control',
-              ].map((step, i) => (
-                <FadeIn key={step} delay={i * 0.12}>
-                  <div className="bg-[#141210] border border-[#2A2622] rounded-3xl p-8">
-                    <p className="text-xs uppercase tracking-widest text-[#6B6560] mb-4">
-                      Step {i + 1}
-                    </p>
-                    <p
-                      className="font-serif font-light text-[#F3EEE6] text-2xl leading-snug"
-                      style={{ fontFamily: 'var(--font-serif)' }}
-                    >
-                      {step}
-                    </p>
-                  </div>
-                </FadeIn>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ──────────────────────────────────────────────────────
-            SECTION 6: SOFT LANDING
-        ────────────────────────────────────────────────────── */}
-        <section className="py-32 border-t border-[#2A2622]">
-          <div className="container mx-auto px-6 max-w-6xl grid lg:grid-cols-2 gap-20 items-center">
-            {/* Text */}
-            <div>
-              <FadeIn>
-                <h2
-                  className="font-serif text-4xl md:text-5xl font-light text-[#F3EEE6] leading-tight mb-10"
-                  style={{ fontFamily: 'var(--font-serif)' }}
-                >
-                  Most blockers end. StillOff eases you back.
-                </h2>
+                </button>
               </FadeIn>
-              <FadeIn delay={0.1}>
-                <ul className="space-y-5">
-                  {[
-                    '15-minute post-session firewall.',
-                    'High-dopamine apps stay quiet.',
-                    'Utility apps stay open so life still works.',
-                  ].map((bullet) => (
-                    <li key={bullet} className="flex items-start gap-4">
-                      <span className="text-[#6E4637] mt-1">—</span>
-                      <span className="text-[#BEB4A7] text-lg font-light leading-7">{bullet}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Why It Works ─────────────────────────────────────────────────────────────
+
+const WHY_POINTS = [
+  'Removes the decision in your weakest moment.',
+  'Interrupts the behavior before it becomes automatic.',
+  'Adds enough friction to break the reflex.',
+  'Replaces the loop with a reset.',
+  'Protects the minutes after the session ends.',
+];
+
+function WhyItWorks() {
+  return (
+    <section className="py-32 px-6 border-t border-[#2A2622]">
+      <div className="max-w-4xl mx-auto">
+        <FadeIn>
+          <p className="text-[11px] font-sans tracking-[0.22em] uppercase text-[#6E4637] mb-4">Behavioral design</p>
+          <h2 className="font-serif text-4xl sm:text-5xl text-[#F3EEE6] mb-16">Why it works.</h2>
+        </FadeIn>
+        <div>
+          {WHY_POINTS.map((point, i) => (
+            <FadeIn key={i} delay={i * 0.1} y={16}>
+              <div className="py-8 border-b border-[#2A2622] last:border-b-0 flex items-center gap-8">
+                <span className="font-serif text-4xl sm:text-5xl text-[#6E4637]/25 font-light shrink-0 w-10 text-right tabular-nums">
+                  {i + 1}
+                </span>
+                <p className="font-serif text-xl sm:text-2xl text-[#F3EEE6] leading-snug">{point}</p>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Credibility ──────────────────────────────────────────────────────────────
+
+const TESTIMONIALS = [
+  {
+    quote: "I didn't realize how deep I was until StillOff locked me out. That minute felt like catching a breath I'd forgotten existed.",
+    author: 'Early tester, 28',
+  },
+  {
+    quote: "It's not about willpower anymore. It just stops before I can talk myself into it.",
+    author: 'Beta user, 34',
+  },
+  {
+    quote: "The soft landing is what got me. I'd reset and then immediately be back on Instagram. Now there's actually a buffer.",
+    author: 'Early tester, 22',
+  },
+];
+
+function Credibility() {
+  return (
+    <section className="py-32 px-6 border-t border-[#2A2622]">
+      <div className="max-w-4xl mx-auto">
+        <FadeIn>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1C1917] border border-[#2A2622] mb-14">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#6E4637]" />
+            <p className="text-xs text-[#BEB4A7] font-sans">Built for the moment most apps miss</p>
+          </div>
+        </FadeIn>
+        <div className="grid sm:grid-cols-3 gap-4 mb-6">
+          {TESTIMONIALS.map((t, i) => (
+            <FadeIn key={i} delay={i * 0.14} y={20}>
+              <div className="p-6 rounded-2xl bg-[#0F0E0C] border border-[#2A2622] h-full flex flex-col justify-between gap-5">
+                <p className="font-serif text-[15px] text-[#F3EEE6] leading-relaxed">"{t.quote}"</p>
+                <p className="text-[11px] text-[#BEB4A7]/55 font-sans">{t.author}</p>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <FadeIn delay={0.2} y={16}>
+            <div className="p-6 rounded-2xl bg-[#0F0E0C] border border-[#2A2622] flex items-start gap-4">
+              <div className="w-8 h-8 rounded-xl bg-[#1C1917] border border-[#2A2622] flex items-center justify-center shrink-0 mt-0.5">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M7 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z" stroke="#6E4637" strokeWidth="1.2" />
+                  <path d="M7 4.5v3l2 1" stroke="#6E4637" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-serif text-[15px] text-[#F3EEE6] mb-1.5">Your sessions are private by default.</p>
+                <p className="text-xs text-[#BEB4A7] font-sans leading-relaxed">We don't sell behavior data. StillOff runs on your device and reports to no one but you.</p>
+              </div>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.3} y={16}>
+            <div className="p-6 rounded-2xl bg-[#0F0E0C] border border-[#2A2622] flex items-start gap-4">
+              <div className="w-8 h-8 rounded-xl bg-[#1C1917] border border-[#2A2622] flex items-center justify-center shrink-0 mt-0.5">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <circle cx="7" cy="7" r="5.5" stroke="#6E4637" strokeWidth="1.2" />
+                  <path d="M4.5 7l2 2 3.5-3.5" stroke="#6E4637" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-serif text-[15px] text-[#F3EEE6] mb-1.5">Built for the moment willpower fails.</p>
+                <p className="text-xs text-[#BEB4A7] font-sans leading-relaxed">Not for the person who decided to change. For the person mid-loop who doesn't know how to stop.</p>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Pricing ──────────────────────────────────────────────────────────────────
+
+const PRICING_TIERS = [
+  {
+    name: 'Free',
+    price: null as null,
+    desc: 'Start here.',
+    features: ['3-min sessions', '1 AI suggestion/week', 'Basic streak tracking'],
+    cta: null as null,
+    featured: false,
+    badge: null as null,
+  },
+  {
+    name: 'Plus',
+    price: { monthly: '$5.99', yearly: '$47.99' },
+    desc: 'For people ready to break the loop.',
+    features: ['Hard Lock', 'Guided Reset', 'Soft Landing', '3 AI interventions/day', 'Full streak history'],
+    cta: 'Start free trial',
+    featured: true,
+    badge: 'Most Popular',
+  },
+  {
+    name: 'Premium',
+    price: { monthly: '$9.99', yearly: '$79.99' },
+    desc: 'Everything, maximized.',
+    features: ['Everything in Plus', 'Unlimited AI interventions', 'Hard Lock Mode', 'App Firewall', 'Priority support'],
+    cta: 'Get Premium',
+    featured: false,
+    badge: null as null,
+  },
+];
+
+function Pricing({ showToast }: { showToast: (msg: string) => void }) {
+  const [yearly, setYearly] = useState(false);
+
+  return (
+    <section className="py-32 px-6 border-t border-[#2A2622]">
+      <div className="max-w-4xl mx-auto">
+        <FadeIn>
+          <p className="text-[11px] font-sans tracking-[0.22em] uppercase text-[#6E4637] mb-4">Access</p>
+          <h2 className="font-serif text-4xl sm:text-5xl text-[#F3EEE6] mb-3">Simple pricing.</h2>
+          <p className="text-sm text-[#BEB4A7] font-sans mb-8">The free plan is real. Not a 7-day trick.</p>
+          <div className="flex items-center gap-3 mb-14">
+            <span className={`text-sm font-sans transition-colors ${!yearly ? 'text-[#F3EEE6]' : 'text-[#BEB4A7]'}`}>Monthly</span>
+            <button onClick={() => setYearly(!yearly)}
+              className={`relative w-10 h-5 rounded-full transition-colors ${yearly ? 'bg-[#6E4637]' : 'bg-[#2A2622]'}`}>
+              <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-[#F3EEE6] transition-transform duration-200 ${yearly ? 'translate-x-5' : 'translate-x-0.5'}`} />
+            </button>
+            <span className={`text-sm font-sans transition-colors ${yearly ? 'text-[#F3EEE6]' : 'text-[#BEB4A7]'}`}>
+              Yearly <span className="text-[#6E4637] text-xs">· Save ~30%</span>
+            </span>
+          </div>
+        </FadeIn>
+        <div className="grid sm:grid-cols-3 gap-4">
+          {PRICING_TIERS.map((tier, i) => (
+            <FadeIn key={tier.name} delay={i * 0.12} y={20}>
+              <div className={`relative rounded-2xl p-7 h-full flex flex-col ${
+                tier.featured ? 'bg-[#F3EEE6]' : 'bg-[#0F0E0C] border border-[#2A2622]'}`}>
+                {tier.badge && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[#6E4637] text-[#F3EEE6] text-[10px] font-sans font-medium tracking-wide whitespace-nowrap">
+                    {tier.badge}
+                  </span>
+                )}
+                <div className="mb-7">
+                  <p className={`font-serif text-xl mb-1 ${tier.featured ? 'text-[#11100E]' : 'text-[#F3EEE6]'}`}>{tier.name}</p>
+                  <p className={`text-xs font-sans mb-4 ${tier.featured ? 'text-[#6E4637]' : 'text-[#BEB4A7]'}`}>{tier.desc}</p>
+                  {tier.price ? (
+                    <p className={`font-serif text-3xl ${tier.featured ? 'text-[#11100E]' : 'text-[#F3EEE6]'}`}>
+                      {yearly ? tier.price.yearly : tier.price.monthly}
+                      <span className={`text-sm font-sans ${tier.featured ? 'text-[#6E4637]' : 'text-[#BEB4A7]'}`}>
+                        {yearly ? '/yr' : '/mo'}
+                      </span>
+                    </p>
+                  ) : (
+                    <p className={`font-serif text-3xl ${tier.featured ? 'text-[#11100E]' : 'text-[#F3EEE6]'}`}>Free</p>
+                  )}
+                </div>
+                <ul className="space-y-2.5 mb-8 flex-1">
+                  {tier.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2.5">
+                      <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                        <path d="M1.5 5.5l2.5 2.5 5.5-5" stroke="#6E4637" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <span className={`text-xs font-sans ${tier.featured ? 'text-[#11100E]/75' : 'text-[#BEB4A7]'}`}>{f}</span>
                     </li>
                   ))}
                 </ul>
-              </FadeIn>
-            </div>
-
-            {/* App status card */}
-            <FadeIn delay={0.2}>
-              <div className="bg-[#0D0C0B] border border-[#2A2622] rounded-3xl p-8 max-w-sm mx-auto lg:mx-0 w-full">
-                <p className="text-xs uppercase tracking-widest text-[#6B6560] mb-6">
-                  After your session
-                </p>
-                <div className="space-y-4">
-                  {softLandingApps.map((app) => (
-                    <div key={app.name} className="flex items-center justify-between">
-                      <span className="text-[#BEB4A7] font-light">{app.name}</span>
-                      <span
-                        className={`text-sm font-light px-3 py-1 rounded-full ${
-                          app.quiet
-                            ? 'text-[#6E4637] bg-[#6E4637]/10 border border-[#6E4637]/30'
-                            : 'text-[#F3EEE6]/60 bg-white/5 border border-white/10'
-                        }`}
-                      >
-                        {app.quiet ? 'Quiet' : 'Open'}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </FadeIn>
-          </div>
-        </section>
-
-        {/* ──────────────────────────────────────────────────────
-            SECTION 7: DIFFERENTIATION
-        ────────────────────────────────────────────────────── */}
-        <section className="py-32 border-t border-[#2A2622]">
-          <div className="container mx-auto px-6 max-w-3xl">
-            <FadeIn>
-              <SectionHeading title="Everything else tells you to stop. StillOff is built to stop you." />
-            </FadeIn>
-
-            <FadeIn delay={0.1}>
-              <div className="border border-[#2A2622] rounded-3xl overflow-hidden">
-                {/* Header */}
-                <div className="grid grid-cols-2 border-b border-[#2A2622]">
-                  <div className="px-8 py-5 border-r border-[#2A2622]">
-                    <p className="text-xs uppercase tracking-widest text-[#4A4440]">Everything else</p>
-                  </div>
-                  <div className="px-8 py-5">
-                    <p className="text-xs uppercase tracking-widest text-[#BEB4A7]">StillOff</p>
-                  </div>
-                </div>
-
-                {/* Rows */}
-                {comparisonRows.map(([left, right], i) => {
-                  const isLast = i === comparisonRows.length - 1;
-                  return (
-                    <div
-                      key={left}
-                      className={`grid grid-cols-2 ${
-                        i < comparisonRows.length - 1 ? 'border-b border-[#2A2622]' : ''
-                      }`}
-                    >
-                      <div className="px-8 py-5 border-r border-[#2A2622]">
-                        <p className="text-[#4A4440] font-light text-sm">{left}</p>
-                      </div>
-                      <div className="px-8 py-5">
-                        <p
-                          className={`font-light text-sm ${
-                            isLast
-                              ? 'text-[#F3EEE6] font-medium'
-                              : 'text-[#BEB4A7]'
-                          }`}
-                        >
-                          {right}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </FadeIn>
-          </div>
-        </section>
-
-        {/* ──────────────────────────────────────────────────────
-            SECTION 8: RELIEF
-        ────────────────────────────────────────────────────── */}
-        <section className="py-40 border-t border-[#2A2622]">
-          <div className="container mx-auto px-6 max-w-2xl text-center">
-            <FadeIn>
-              <h2
-                className="font-serif text-4xl md:text-5xl lg:text-6xl font-light text-[#F3EEE6] leading-tight mb-10"
-                style={{ fontFamily: 'var(--font-serif)' }}
-              >
-                You don&apos;t need more guilt about your habits.
-              </h2>
-            </FadeIn>
-            <FadeIn delay={0.2}>
-              <p className="text-[#BEB4A7] text-xl leading-8 font-light">
-                You need a way to break them while they&apos;re happening.
-              </p>
-            </FadeIn>
-          </div>
-        </section>
-
-        {/* ──────────────────────────────────────────────────────
-            SECTION 9: PROOF
-        ────────────────────────────────────────────────────── */}
-        <section className="py-32 border-t border-[#2A2622]">
-          <div className="container mx-auto px-6 max-w-6xl grid lg:grid-cols-3 gap-8 items-start">
-            {/* Testimonials */}
-            <div className="flex flex-col gap-6">
-              {testimonials.map((t, i) => (
-                <FadeIn key={t.person} delay={i * 0.1}>
-                  <div className="bg-[#141210] border border-[#2A2622] rounded-3xl p-8">
-                    <p
-                      className="font-serif font-light italic text-[#F3EEE6] text-xl leading-snug mb-5"
-                      style={{ fontFamily: 'var(--font-serif)' }}
-                    >
-                      &ldquo;{t.quote}&rdquo;
-                    </p>
-                    <p className="text-xs uppercase tracking-widest text-[#4A4440]">{t.person}</p>
-                  </div>
-                </FadeIn>
-              ))}
-            </div>
-
-            {/* Proof of Presence card */}
-            <FadeIn delay={0.2} className="lg:col-span-2">
-              <div className="bg-[#0D0C0B] border border-[#2A2622] rounded-3xl p-10 md:p-12">
-                <p className="text-xs uppercase tracking-widest text-[#6B6560] mb-6">
-                  Session complete
-                </p>
-                <p
-                  className="font-serif font-light text-[#F3EEE6] text-6xl md:text-7xl mb-5"
-                  style={{ fontFamily: 'var(--font-serif)' }}
-                >
-                  18 min
-                </p>
-                <p
-                  className="font-serif font-light text-[#BEB4A7] text-xl mb-8 leading-snug"
-                  style={{ fontFamily: 'var(--font-serif)' }}
-                >
-                  I sat with the grief. I didn&apos;t look away.
-                </p>
-                <p
-                  className="font-serif font-light italic text-[#6B6560] text-base leading-7 mb-10"
-                  style={{ fontFamily: 'var(--font-serif)' }}
-                >
-                  It didn&apos;t pass. You moved through it. The world waited. It was fine.
-                </p>
-                <div className="border-t border-[#2A2622] pt-8 space-y-5">
-                  <p className="text-xs text-[#4A4440] font-light tracking-wide">
-                    StillOff · Private by default · Shareable when ready
-                  </p>
-                  <button
-                    onClick={handleShare}
-                    className="text-[#F3EEE6] text-sm font-light hover:text-white transition-colors underline underline-offset-4 decoration-[#2A2622]"
-                  >
-                    One tap to send it to someone who needs to see it.
+                {tier.cta ? (
+                  <button onClick={() => showToast('Launching soon — join the waitlist below!')}
+                    className={`w-full py-2.5 rounded-xl text-sm font-sans font-medium transition-colors ${
+                      tier.featured
+                        ? 'bg-[#6E4637] text-[#F3EEE6] hover:bg-[#7D5040]'
+                        : 'bg-[#1C1917] text-[#BEB4A7] border border-[#2A2622] hover:text-[#F3EEE6]'}`}>
+                    {tier.cta}
                   </button>
-                </div>
+                ) : (
+                  <p className="text-[11px] font-sans text-center text-[#BEB4A7]/40">No account needed to start</p>
+                )}
               </div>
             </FadeIn>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Waitlist ─────────────────────────────────────────────────────────────────
+
+function Waitlist({ showToast }: { showToast: (msg: string) => void }) {
+  const [email, setEmail] = useState('');
+  const [sending, setSending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setSending(true);
+    try {
+      const res = await fetch('https://formspree.io/f/mzdklnwv', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ email, source: 'waitlist' }),
+      });
+      if (res.ok) {
+        showToast("You're on the list. See you on the other side.");
+        setEmail('');
+      } else {
+        showToast('Something went wrong. Try again.');
+      }
+    } catch {
+      showToast('Something went wrong. Try again.');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <section id="waitlist" className="py-40 px-6 border-t border-[#2A2622]">
+      <div className="max-w-lg mx-auto text-center">
+        <FadeIn y={36}>
+          <div className="flex justify-center mb-14">
+            <BreathingOrb size={80} />
           </div>
-        </section>
+          <h2 className="font-serif text-4xl sm:text-5xl text-[#F3EEE6] leading-tight mb-6">
+            You don't need another app that watches you lose control.
+          </h2>
+          <p className="font-serif text-xl italic text-[#BEB4A7] mb-3">
+            You need one that steps in before you do.
+          </p>
+          <p className="text-sm text-[#BEB4A7] font-sans mb-12">Be first when StillOff launches.</p>
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              className="flex-1 px-5 py-3.5 rounded-full bg-[#0F0E0C] border border-[#2A2622] text-[#F3EEE6] text-sm font-sans placeholder-[#BEB4A7]/40 focus:outline-none focus:border-[#6E4637] transition-colors" />
+            <button type="submit" disabled={sending}
+              className="px-7 py-3.5 rounded-full bg-[#6E4637] text-[#F3EEE6] text-sm font-sans font-medium hover:bg-[#7D5040] transition-colors disabled:opacity-50 whitespace-nowrap">
+              {sending ? 'Joining...' : 'Join waitlist'}
+            </button>
+          </form>
+          <p className="text-[11px] text-[#BEB4A7]/45 font-sans mt-5">No newsletters. One email when it's ready.</p>
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
 
-        {/* ──────────────────────────────────────────────────────
-            SECTION 10: PRICING
-        ────────────────────────────────────────────────────── */}
-        <section className="py-32 border-t border-[#2A2622]">
-          <div className="container mx-auto px-6 max-w-6xl">
-            <FadeIn>
-              <SectionHeading
-                title="Start free. Go deeper."
-                body="The free plan is real — not a 7-day trick."
-              />
-            </FadeIn>
+// ─── Footer ───────────────────────────────────────────────────────────────────
 
-            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              {pricingTiers.map((tier, i) => (
-                <FadeIn key={tier.name} delay={i * 0.1}>
-                  <div
-                    className={`rounded-3xl p-8 h-full flex flex-col relative ${
-                      tier.highlight
-                        ? 'bg-[#F3EEE6]'
-                        : 'bg-[#141210] border border-[#2A2622]'
-                    }`}
-                  >
-                    {tier.badge && (
-                      <div className="absolute -top-3 left-8">
-                        <span
-                          className="text-xs font-medium px-3 py-1 rounded-full"
-                          style={{
-                            backgroundColor: '#6E4637',
-                            color: '#F3EEE6',
-                          }}
-                        >
-                          {tier.badge}
-                        </span>
-                      </div>
-                    )}
+function Footer() {
+  return (
+    <footer className="border-t border-[#2A2622] py-10 px-6">
+      <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p className="font-serif text-xl text-[#F3EEE6]">StillOff</p>
+        <div className="flex items-center gap-7">
+          {[
+            { label: 'Privacy', href: '/privacy' },
+            { label: 'Terms', href: '/terms' },
+            { label: 'hello@stilloff.com', href: 'mailto:hello@stilloff.com' },
+          ].map((link) => (
+            <a key={link.label} href={link.href}
+              className="text-xs text-[#BEB4A7] font-sans hover:text-[#F3EEE6] transition-colors">
+              {link.label}
+            </a>
+          ))}
+        </div>
+      </div>
+    </footer>
+  );
+}
 
-                    <div className="mb-8">
-                      <p
-                        className={`text-xs uppercase tracking-widest mb-3 ${
-                          tier.highlight ? 'text-[#6B6560]' : 'text-[#6B6560]'
-                        }`}
-                      >
-                        {tier.name}
-                      </p>
-                      <div className="flex items-baseline gap-1">
-                        <span
-                          className={`font-serif font-light text-4xl ${
-                            tier.highlight ? 'text-[#11100E]' : 'text-[#F3EEE6]'
-                          }`}
-                          style={{ fontFamily: 'var(--font-serif)' }}
-                        >
-                          {tier.price}
-                        </span>
-                        <span
-                          className={`text-sm font-light ${
-                            tier.highlight ? 'text-[#6B6560]' : 'text-[#6B6560]'
-                          }`}
-                        >
-                          {tier.cadence}
-                        </span>
-                      </div>
-                      {tier.annual && (
-                        <p
-                          className={`text-xs mt-2 font-light ${
-                            tier.highlight ? 'text-[#6B6560]' : 'text-[#4A4440]'
-                          }`}
-                        >
-                          {tier.annual}
-                        </p>
-                      )}
-                    </div>
+// ─── Sticky CTA ───────────────────────────────────────────────────────────────
 
-                    <ul className="space-y-3 flex-1 mb-8">
-                      {tier.features.map((feature) => (
-                        <li key={feature} className="flex items-start gap-3">
-                          <span
-                            className={`mt-1.5 w-1 h-1 rounded-full flex-shrink-0 ${
-                              tier.highlight
-                                ? 'bg-[#11100E]/40'
-                                : tier.name === 'Free'
-                                ? 'bg-[#4A4440]'
-                                : 'bg-[#BEB4A7]'
-                            }`}
-                          />
-                          <span
-                            className={`text-sm font-light leading-5 ${
-                              tier.highlight
-                                ? 'text-[#11100E]'
-                                : tier.name === 'Free'
-                                ? 'text-[#4A4440]'
-                                : 'text-[#BEB4A7]'
-                            }`}
-                          >
-                            {feature}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+function StickyCTA() {
+  const [visible, setVisible] = useState(false);
 
-                    {tier.name !== 'Free' && (
-                      <button
-                        onClick={() =>
-                          waitlistRef.current?.scrollIntoView({ behavior: 'smooth' })
-                        }
-                        className={`w-full py-4 rounded-full text-sm font-medium transition-colors ${
-                          tier.highlight
-                            ? 'bg-[#11100E] text-[#F3EEE6] hover:bg-[#1A1815]'
-                            : 'border border-[#2A2622] text-[#BEB4A7] hover:border-[#BEB4A7] hover:text-[#F3EEE6]'
-                        }`}
-                      >
-                        {tier.name === 'Plus' ? 'Start free trial' : 'Get Premium'}
-                      </button>
-                    )}
-                  </div>
-                </FadeIn>
-              ))}
-            </div>
-          </div>
-        </section>
+  useEffect(() => {
+    const onScroll = () => {
+      const scrollPct = window.scrollY / Math.max(document.body.scrollHeight - window.innerHeight, 1);
+      const waitlist = document.querySelector('#waitlist');
+      const nearWaitlist = waitlist ? waitlist.getBoundingClientRect().top < window.innerHeight * 0.85 : false;
+      setVisible(scrollPct > 0.2 && !nearWaitlist);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-        {/* ──────────────────────────────────────────────────────
-            SECTION 11: WAITLIST
-        ────────────────────────────────────────────────────── */}
-        <section
-          ref={waitlistRef}
-          className="py-40 border-t border-[#2A2622]"
-          id="waitlist"
-        >
-          <div className="container mx-auto px-6 max-w-xl">
-            <FadeIn>
-              <div className="text-center">
-                <p
-                  className="font-serif font-light text-[#F3EEE6] text-4xl mb-4"
-                  style={{ fontFamily: 'var(--font-serif)' }}
-                >
-                  That felt different.
-                </p>
-                <p className="text-[#BEB4A7] text-base mb-12 font-light">
-                  That&apos;s what control feels like.
-                </p>
-                <h2
-                  className="font-serif font-light text-[#F3EEE6] text-4xl md:text-5xl leading-tight mb-6"
-                  style={{ fontFamily: 'var(--font-serif)' }}
-                >
-                  Be first when StillOff launches.
-                </h2>
-                <p className="text-[#BEB4A7] text-lg font-light mb-12 leading-7">
-                  The first real intervention for compulsive phone behavior.
-                </p>
-              </div>
-            </FadeIn>
+  return (
+    <AnimatePresence>
+      {visible && (
+        <m.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 0.88, y: 0 }}
+          exit={{ opacity: 0, y: 14 }} transition={{ duration: 0.3 }}
+          className="fixed bottom-6 right-6 lg:right-auto lg:left-6 z-50">
+          <a href="#waitlist"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1C1917]/92 backdrop-blur-md border border-[#2A2622] text-[#F3EEE6] text-sm font-sans hover:bg-[#2A2622]/90 transition-colors shadow-2xl">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#6E4637]" />
+            Join waitlist
+          </a>
+        </m.div>
+      )}
+    </AnimatePresence>
+  );
+}
 
-            <FadeIn delay={0.15}>
-              <form onSubmit={handleWaitlistSubmit} className="flex flex-col sm:flex-row gap-4">
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="Your email"
-                  className="flex-1 bg-[#1A1815] border border-[#2A2622] text-[#F3EEE6] placeholder-[#4A4440] rounded-full px-6 py-4 text-base focus:outline-none focus:border-[#BEB4A7] transition-colors"
-                />
-                <button
-                  type="submit"
-                  className="bg-[#F3EEE6] text-[#11100E] px-8 py-4 rounded-full font-medium text-base hover:bg-white transition-colors whitespace-nowrap"
-                >
-                  Get early access
-                </button>
-              </form>
-              <p className="text-[#4A4440] text-sm text-center mt-6 font-light">
-                No newsletters. One email when it&apos;s ready.
-              </p>
-            </FadeIn>
-          </div>
-        </section>
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
-        {/* ──────────────────────────────────────────────────────
-            SECTION 12: FOOTER
-        ────────────────────────────────────────────────────── */}
-        <footer className="border-t border-[#2A2622] py-12">
-          <div className="container mx-auto px-6 max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-6">
-            <p
-              className="font-serif font-light text-[#F3EEE6] text-2xl"
-              style={{ fontFamily: 'var(--font-serif)' }}
-            >
-              StillOff
-            </p>
-            <nav className="flex items-center gap-6 text-sm text-[#4A4440] font-light">
-              <a href="/privacy" className="hover:text-[#BEB4A7] transition-colors">
-                Privacy
-              </a>
-              <span className="text-[#2A2622]">·</span>
-              <a href="/terms" className="hover:text-[#BEB4A7] transition-colors">
-                Terms
-              </a>
-              <span className="text-[#2A2622]">·</span>
-              <a
-                href="mailto:hello@stilloff.com"
-                className="hover:text-[#BEB4A7] transition-colors"
-              >
-                hello@stilloff.com
-              </a>
-            </nav>
-          </div>
-        </footer>
+export default function Page() {
+  const [demoOpen, setDemoOpen] = useState(false);
+  const [toast, setToast] = useState<ToastItem | null>(null);
+  const toastIdRef = useRef(0);
+
+  const showToast = useCallback((msg: string) => {
+    toastIdRef.current += 1;
+    setToast({ id: toastIdRef.current, msg });
+  }, []);
+
+  return (
+    <LazyMotion features={domAnimation} strict>
+      <main>
+        <Hero onOpenDemo={() => setDemoOpen(true)} />
+        <TheLoop />
+        <CategoryShift />
+        <HowItWorks />
+        <ProductDemo />
+        <WhyItWorks />
+        <Credibility />
+        <Pricing showToast={showToast} />
+        <Waitlist showToast={showToast} />
+        <Footer />
+        <StickyCTA />
       </main>
+
+      <AnimatePresence>
+        {demoOpen && (
+          <DemoModal key="demo" onClose={() => setDemoOpen(false)} showToast={showToast} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {toast && (
+          <Toast key={toast.id} msg={toast.msg} onDone={() => setToast(null)} />
+        )}
+      </AnimatePresence>
     </LazyMotion>
   );
 }

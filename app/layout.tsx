@@ -19,19 +19,19 @@ const sans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "StillOff — When you can't stop, StillOff does.",
-  description: "Real-time intervention for compulsive phone use.",
-  keywords: ["compulsive phone use", "stop checking phone", "phone addiction", "digital detox", "doomscrolling", "how to stop checking my ex instagram", "anxiety phone use", "screen time intervention"],
+  title: "StillOff — When discipline disappears, StillOff steps in.",
+  description: "StillOff is a real-time intervention app for compulsive phone use, designed to interrupt doomscrolling and guide users into a reset before the loop deepens.",
+  keywords: ["phone addiction app", "stop doomscrolling", "compulsive phone use", "digital detox app", "reduce screen time", "app blocker for phone addiction", "screen addiction app", "break phone scrolling habit"],
   openGraph: {
-    title: "StillOff — When you can't stop, StillOff does.",
-    description: "When you can't stop, StillOff does.",
+    title: "StillOff — When discipline disappears, StillOff steps in.",
+    description: "The first real-time intervention for compulsive phone use.",
     url: "https://stilloff.com",
     siteName: "StillOff",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "StillOff — When you can't stop, StillOff does.",
+    title: "StillOff — When discipline disappears, StillOff steps in.",
     description: "Real-time intervention for compulsive phone use.",
   },
 };
