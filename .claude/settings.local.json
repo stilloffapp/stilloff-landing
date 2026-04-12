@@ -18,7 +18,12 @@
       "Bash(node -e \"require\\('puppeteer'\\); console.log\\('puppeteer ok'\\)\")",
       "Bash(node generate-pdf.cjs)",
       "Bash(Invoke-WebRequest -Uri http://localhost:3000 -UseBasicParsing -TimeoutSec 10)",
-      "Bash(Select-Object StatusCode)"
+      "Bash(Select-Object StatusCode)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill /PID 27016 /F)",
+      "Bash(cmd:*)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(echo \"EXIT:$?\")"
     ]
   }
 }
