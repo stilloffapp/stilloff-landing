@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(curl:*)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(taskkill /F /IM node.exe)",
+      "Bash(npx next:*)",
+      "Bash(powershell -Command \"Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force\")",
+      "WebSearch",
+      "WebFetch(domain:www.opal.so)",
+      "WebFetch(domain:one-sec.app)",
+      "WebFetch(domain:opalapp.com)",
+      "WebFetch(domain:freedom.to)",
+      "Bash(powershell:*)",
+      "Bash(npx tsc:*)",
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(node -e \"require\\('puppeteer'\\); console.log\\('puppeteer ok'\\)\")",
+      "Bash(node generate-pdf.cjs)",
+      "Bash(Invoke-WebRequest -Uri http://localhost:3000 -UseBasicParsing -TimeoutSec 10)",
+      "Bash(Select-Object StatusCode)"
+    ]
+  }
+}
