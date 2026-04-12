@@ -19,20 +19,32 @@ const sans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "StillOff — When discipline disappears, StillOff steps in.",
-  description: "StillOff is a real-time intervention app for compulsive phone use, designed to interrupt doomscrolling and guide users into a reset before the loop deepens.",
-  keywords: ["phone addiction app", "stop doomscrolling", "compulsive phone use", "digital detox app", "reduce screen time", "app blocker for phone addiction", "screen addiction app", "break phone scrolling habit"],
+  title: "StillOff — When you can't stop, StillOff does.",
+  description: "StillOff is a real-time behavioral intervention for compulsive phone use. It steps in before the spiral takes over — guided breathing, app lock, soft landing.",
+  keywords: ["phone addiction app", "stop doomscrolling", "compulsive phone use", "digital detox app", "reduce screen time", "app blocker for phone addiction", "screen addiction app", "break phone scrolling habit", "screen time intervention", "behavioral intervention app"],
+  metadataBase: new URL("https://stilloff.com"),
+  alternates: { canonical: "/" },
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
   openGraph: {
-    title: "StillOff — When discipline disappears, StillOff steps in.",
-    description: "The first real-time intervention for compulsive phone use.",
+    title: "StillOff — When you can't stop, StillOff does.",
+    description: "A real-time intervention that steps in before the spiral takes over. Not a blocker — a guided reset.",
     url: "https://stilloff.com",
     siteName: "StillOff",
     type: "website",
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "StillOff — When discipline disappears, StillOff steps in.",
-    description: "Real-time intervention for compulsive phone use.",
+    title: "StillOff — When you can't stop, StillOff does.",
+    description: "Real-time behavioral intervention for compulsive phone use.",
+    creator: "@stilloff",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
