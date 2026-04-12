@@ -146,6 +146,16 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
                   </form>
                   <p className="mt-3 text-left text-xs text-[#BEB4A7]/60">No newsletters. One email when it's ready.</p>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    setTimeout(() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" }), 350);
+                  }}
+                  className="mt-1 text-sm text-[#BEB4A7] transition hover:text-[#F3EEE6]"
+                >
+                  Start my free plan — $5.99/mo →
+                </button>
               </m.div>
             )}
           </AnimatePresence>
@@ -245,7 +255,7 @@ export default function Page() {
               <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }} className="mb-5 text-xs uppercase tracking-[0.26em] text-[#BEB4A7]">
                 You picked up your phone 84 times today.
               </m.p>
-              <m.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.08 }} className="max-w-2xl leading-[0.93] tracking-[-0.05em] text-[#F3EEE6]" style={{ fontFamily: "var(--font-cormorant, Georgia, serif)", fontSize: "clamp(3rem,8vw,6rem)" }}>
+              <m.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.08 }} className="max-w-2xl leading-[0.93] tracking-[-0.06em] text-[#F3EEE6]" style={{ fontFamily: "var(--font-cormorant, Georgia, serif)", fontSize: "clamp(3rem,8vw,6rem)" }}>
                 {heroHeadline}
               </m.h1>
               <m.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.16 }} className="mt-8 max-w-xl text-xl leading-[1.4] text-[#BEB4A7] sm:text-2xl">
@@ -259,6 +269,9 @@ export default function Page() {
                   See how it works
                 </a>
               </m.div>
+              <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.9, delay: 0.44 }} className="mt-5 text-xs text-[#BEB4A7]/55">
+                Plans start at $5.99/mo — free tier available
+              </m.p>
             </div>
 
             {/* right — phone + orb */}
@@ -357,7 +370,7 @@ export default function Page() {
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {[
               ["The Lock", "When StillOff activates, the apps that fuel the spiral go quiet."],
-              ["The Reset", "Breathing, silence, and ambient sound turn your phone into a reset space."],
+              ["The Reset", "breathing, silence, ambient sound"],
               ["The Soft Landing", "A 15-minute post-session firewall keeps high-dopamine apps quiet."],
               ["Learns your patterns", "StillOff steps in before you have to ask."],
             ].map(([title, body], i) => (
@@ -395,33 +408,16 @@ export default function Page() {
         {/* ══════════════════════════════════════════════════
             SOFT LANDING
         ══════════════════════════════════════════════════ */}
-        <section className="relative z-10 mx-auto max-w-7xl px-6 py-20 sm:px-8 lg:px-12">
-          <div className="grid items-center gap-10 rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 lg:grid-cols-2 lg:p-10">
-            <FadeIn>
-              <p className="mb-4 text-xs uppercase tracking-[0.24em] text-[#BEB4A7]/70">Soft landing</p>
-              <h2 style={{ fontFamily: "var(--font-cormorant, Georgia, serif)" }} className="text-4xl tracking-[-0.04em] text-[#F3EEE6] sm:text-5xl">
-                Most blockers end. StillOff eases you back.
-              </h2>
-              <ul className="mt-6 space-y-3 text-base leading-7 text-[#BEB4A7]">
-                <li>15-minute post-session firewall.</li>
-                <li>High-dopamine apps stay quiet.</li>
-                <li>Utility apps stay open so life still works.</li>
-              </ul>
-            </FadeIn>
-            <FadeIn delay={0.1} className="relative flex items-center justify-center py-6">
-              <div className="w-full max-w-sm rounded-[1.75rem] border border-white/10 bg-[#0d0c0b] p-6">
-                <p className="mb-5 text-xs uppercase tracking-[0.22em] text-[#BEB4A7]/70">After your session</p>
-                <div className="space-y-3">
-                  {[["Phone", true], ["Maps", true], ["Notes", true], ["Instagram", false], ["TikTok", false], ["X", false]].map(([app, open]) => (
-                    <div key={app as string} className="flex items-center justify-between rounded-xl border border-white/8 px-4 py-3">
-                      <span className={`text-sm ${open ? "text-[#F3EEE6]" : "text-[#BEB4A7]/50"}`}>{app as string}</span>
-                      <span className={`text-xs uppercase tracking-[0.2em] ${open ? "text-[#BEB4A7]" : "text-[#6E4637]"}`}>{open ? "Open" : "Quiet"}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </FadeIn>
-          </div>
+        <section className="relative z-10 mx-auto max-w-4xl px-6 py-24 text-center sm:px-8 lg:px-12">
+          <FadeIn>
+            <p className="mb-5 text-xs uppercase tracking-[0.24em] text-[#BEB4A7]/60">Soft landing</p>
+            <h2 style={{ fontFamily: "var(--font-cormorant, Georgia, serif)" }} className="text-4xl tracking-[-0.04em] text-[#F3EEE6] sm:text-5xl">
+              Most blockers end.<br />StillOff eases you back.
+            </h2>
+            <p className="mx-auto mt-7 max-w-xl text-lg leading-8 text-[#BEB4A7]/75">
+              You don&rsquo;t get dropped straight back into the same loop you just escaped. There&rsquo;s space. There&rsquo;s distance. Enough to make a different decision.
+            </p>
+          </FadeIn>
         </section>
 
         {/* ══════════════════════════════════════════════════
@@ -444,6 +440,26 @@ export default function Page() {
                 <div className={`border-l border-white/10 px-6 py-5 text-sm ${i === comparisonRows.length - 1 ? "font-semibold text-[#F3EEE6]" : "text-[#F3EEE6]"}`}>{right}</div>
               </div>
             ))}
+          </FadeIn>
+        </section>
+
+        {/* ══════════════════════════════════════════════════
+            READY NUDGE
+        ══════════════════════════════════════════════════ */}
+        <section className="relative z-10 mx-auto max-w-3xl px-6 py-16 text-center sm:px-8 lg:px-12">
+          <FadeIn>
+            <p style={{ fontFamily: "var(--font-cormorant, Georgia, serif)" }} className="text-3xl tracking-[-0.03em] text-[#F3EEE6] sm:text-4xl">
+              Ready to stop the loop in real life?
+            </p>
+            <div className="mt-7">
+              <a
+                href="#pricing"
+                onClick={(e) => { e.preventDefault(); document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" }); }}
+                className="inline-block rounded-2xl border border-white/10 px-7 py-3.5 text-sm font-semibold text-[#F3EEE6] transition hover:border-white/20 hover:bg-white/5"
+              >
+                See pricing &amp; start free
+              </a>
+            </div>
           </FadeIn>
         </section>
 
@@ -510,7 +526,7 @@ export default function Page() {
         {/* ══════════════════════════════════════════════════
             PRICING
         ══════════════════════════════════════════════════ */}
-        <section className="relative z-10 mx-auto max-w-6xl px-6 py-16 sm:px-8 lg:px-12">
+        <section id="pricing" className="relative z-10 mx-auto max-w-6xl px-6 py-16 sm:px-8 lg:px-12">
           <FadeIn>
             <div className="mb-10 text-center">
               <h2 style={{ fontFamily: "var(--font-cormorant, Georgia, serif)" }} className="text-4xl tracking-[-0.04em] text-[#F3EEE6] sm:text-5xl">Start free. Go deeper.</h2>

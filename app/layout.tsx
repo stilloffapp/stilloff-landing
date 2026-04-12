@@ -19,8 +19,8 @@ const sans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "StillOff — When you can't stop, StillOff does.",
-  description: "StillOff is a real-time behavioral intervention for compulsive phone use. It steps in before the spiral takes over — guided breathing, app lock, soft landing.",
+  title: "StillOff — Stop Checking Your Phone Constantly",
+  description: "A real-time intervention for compulsive phone use. StillOff helps you stop checking your phone constantly by locking you into a guided reset before the loop takes over.",
   keywords: ["phone addiction app", "stop doomscrolling", "compulsive phone use", "digital detox app", "reduce screen time", "app blocker for phone addiction", "screen addiction app", "break phone scrolling habit", "screen time intervention", "behavioral intervention app"],
   metadataBase: new URL("https://stilloff.com"),
   alternates: { canonical: "/" },
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
     shortcut: "/favicon.svg",
   },
   openGraph: {
-    title: "StillOff — When you can't stop, StillOff does.",
-    description: "A real-time intervention that steps in before the spiral takes over. Not a blocker — a guided reset.",
+    title: "StillOff — Stop Checking Your Phone Constantly",
+    description: "A real-time intervention for compulsive phone use. StillOff helps you stop checking your phone constantly by locking you into a guided reset before the loop takes over.",
     url: "https://stilloff.com",
     siteName: "StillOff",
     type: "website",
@@ -38,8 +38,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "StillOff — When you can't stop, StillOff does.",
-    description: "Real-time behavioral intervention for compulsive phone use.",
+    title: "StillOff — Stop Checking Your Phone Constantly",
+    description: "Real-time intervention for compulsive phone use. A guided reset before the loop takes over.",
     creator: "@stilloff",
   },
   robots: {
