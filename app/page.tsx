@@ -145,7 +145,7 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
                       onClose();
                       document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
                     }}
-                    className="mt-3 w-full rounded-2xl bg-[#F3EEE6] px-8 py-4 text-sm font-semibold text-[#11100E] hover:opacity-90"
+                    className="cta-glow mt-3 w-full rounded-2xl bg-[#F3EEE6] px-8 py-4 text-sm font-semibold text-[#11100E] hover:opacity-90"
                   >
                     Start free
                   </button>
@@ -154,7 +154,7 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
                   <p className="mb-3 text-left text-xs uppercase tracking-[0.22em] text-[#BEB4A7]">Be first when StillOff launches</p>
                   <form onSubmit={onSubmit} className="flex flex-col gap-3 sm:flex-row">
                     <input type="email" name="email" required placeholder="Email address" className="min-w-0 flex-1 rounded-xl border border-white/10 bg-[#11100E] px-4 py-3 text-sm text-[#F3EEE6] outline-none placeholder:text-[#BEB4A7]/50 focus:border-[#6E4637]" />
-                    <button type="submit" className="rounded-xl bg-[#F3EEE6] px-5 py-3 text-sm font-semibold text-[#11100E] transition hover:opacity-90">Get early access</button>
+                    <button type="submit" className="cta-glow rounded-xl bg-[#F3EEE6] px-5 py-3 text-sm font-semibold text-[#11100E] transition hover:opacity-90">Get early access</button>
                   </form>
                   <p className="mt-3 text-left text-xs text-[#BEB4A7]/60">No newsletters. One email when it's ready.</p>
                 </div>
@@ -250,6 +250,34 @@ export default function Page() {
     <LazyMotion features={domAnimation} strict>
       <main className="min-h-screen bg-[#11100E] text-[#F3EEE6] antialiased">
 
+        {/* ── top nav ── */}
+        <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[#11100E]/90 backdrop-blur-md">
+          <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+            <div
+              className="text-2xl font-light tracking-[-0.04em] text-[#F3EEE6]"
+              style={{ fontFamily: "var(--font-cormorant, Georgia, serif)" }}
+            >
+              StillOff
+            </div>
+
+            <div className="hidden items-center gap-8 text-sm text-[#BEB4A7] md:flex">
+              <a href="#how-it-works" className="transition-colors hover:text-[#F3EEE6]">
+                How it works
+              </a>
+              <a href="#pricing" className="transition-colors hover:text-[#F3EEE6]">
+                Pricing
+              </a>
+            </div>
+
+            <button
+              onClick={openDemo}
+              className="cta-glow rounded-2xl bg-[#F3EEE6] px-6 py-2.5 text-sm font-semibold text-[#11100E]"
+            >
+              Try the 60-second lock
+            </button>
+          </div>
+        </nav>
+
         {/* ── ambient bg ── */}
         <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true" style={{ background: "radial-gradient(circle at 65% 30%, rgba(110,70,55,0.10), transparent 55%), radial-gradient(circle at 35% 70%, rgba(110,70,55,0.06), transparent 45%)" }} />
 
@@ -259,7 +287,7 @@ export default function Page() {
         {/* ══════════════════════════════════════════════════
             HERO
         ══════════════════════════════════════════════════ */}
-        <section className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl items-center px-6 py-20 sm:px-8 lg:px-12">
+        <section className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl items-center px-6 pb-20 pt-36 sm:px-8 lg:px-12">
           <div className="grid w-full items-center gap-12 lg:grid-cols-[1fr_520px]">
 
             {/* left — copy */}
@@ -274,7 +302,7 @@ export default function Page() {
                 A real-time intervention that steps in before the spiral takes over.
               </m.p>
               <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.26 }} className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <button onClick={openDemo} className="rounded-2xl bg-[#F3EEE6] px-7 py-3.5 text-sm font-semibold text-[#11100E] transition hover:opacity-90">
+                <button onClick={openDemo} className="cta-glow rounded-2xl bg-[#F3EEE6] px-7 py-3.5 text-sm font-semibold text-[#11100E] transition hover:opacity-90">
                   Try the 60-second lock
                 </button>
                 <a href="#how-it-works" className="rounded-2xl border border-white/10 px-7 py-3.5 text-sm font-semibold text-[#F3EEE6] transition hover:border-white/20 hover:bg-white/5">
@@ -571,7 +599,7 @@ export default function Page() {
                     ))}
                   </div>
                   {tier.cta && (
-                    <a href="#waitlist" className={`mt-6 block rounded-2xl py-3 text-center text-xs font-semibold uppercase tracking-[0.12em] transition ${tier.highlight ? "bg-[#11100E] text-[#F3EEE6] hover:opacity-90" : "border border-white/10 text-[#F3EEE6] hover:bg-white/5"}`}>
+                    <a href="#waitlist" className={`cta-glow mt-6 block rounded-2xl py-3 text-center text-xs font-semibold uppercase tracking-[0.12em] transition ${tier.highlight ? "bg-[#11100E] text-[#F3EEE6] hover:opacity-90" : "border border-white/10 text-[#F3EEE6] hover:bg-white/5"}`}>
                       {tier.cta}
                     </a>
                   )}
@@ -593,7 +621,7 @@ export default function Page() {
               <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-[#BEB4A7]">The first real intervention for compulsive phone behavior.</p>
               <form onSubmit={handleSubmit} className="mx-auto mt-8 flex max-w-lg flex-col gap-3 sm:flex-row">
                 <input type="email" name="email" required placeholder="Email address" className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-[#11100E] px-4 py-3.5 text-sm text-[#F3EEE6] outline-none placeholder:text-[#BEB4A7]/50 focus:border-[#6E4637]" />
-                <button type="submit" className="rounded-2xl bg-[#F3EEE6] px-6 py-3.5 text-sm font-semibold text-[#11100E] transition hover:opacity-90">Get early access</button>
+                <button type="submit" className="cta-glow rounded-2xl bg-[#F3EEE6] px-6 py-3.5 text-sm font-semibold text-[#11100E] transition hover:opacity-90">Get early access</button>
               </form>
               <p className="mt-4 text-xs text-[#BEB4A7]/60">No newsletters. One email when it's ready.</p>
             </div>
@@ -621,7 +649,7 @@ export default function Page() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               onClick={openDemo}
-              className="fixed bottom-4 right-4 z-50 rounded-full border border-white/10 bg-[#11100E]/90 px-5 py-2.5 text-xs font-semibold text-[#F3EEE6] shadow-[0_8px_32px_rgba(0,0,0,0.35)] backdrop-blur-md transition hover:border-white/20 md:bottom-6 md:left-6 md:right-auto"
+              className="cta-glow fixed bottom-4 right-4 z-50 rounded-full border border-white/10 bg-[#11100E]/90 px-5 py-2.5 text-xs font-semibold text-[#F3EEE6] backdrop-blur-md transition hover:border-white/20 md:bottom-6 md:left-6 md:right-auto"
             >
               Lock it now
             </m.button>
