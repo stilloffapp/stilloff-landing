@@ -138,6 +138,18 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
               <m.div key="cta" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="space-y-6">
                 <p className="font-serif text-4xl tracking-[-0.04em] text-[#F3EEE6] sm:text-5xl" style={{ fontFamily: "var(--font-cormorant, Georgia, serif)" }}>That felt different.</p>
                 <p className="text-lg text-[#BEB4A7]">That's what control feels like.</p>
+                <div className="mt-8 border-t border-white/10 pt-6">
+                  <p className="text-base text-[#BEB4A7]">Want this every day?</p>
+                  <button
+                    onClick={() => {
+                      onClose();
+                      document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="mt-3 w-full rounded-2xl bg-[#F3EEE6] px-8 py-4 text-sm font-semibold text-[#11100E] hover:opacity-90"
+                  >
+                    Start free
+                  </button>
+                </div>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
                   <p className="mb-3 text-left text-xs uppercase tracking-[0.22em] text-[#BEB4A7]">Be first when StillOff launches</p>
                   <form onSubmit={onSubmit} className="flex flex-col gap-3 sm:flex-row">
@@ -269,6 +281,11 @@ export default function Page() {
                   See how it works
                 </a>
               </m.div>
+              <div className="mt-6 flex items-center justify-center gap-2 text-sm text-[#BEB4A7]">
+                <span>Free plan available</span>
+                <span className="text-[#6E4637]">•</span>
+                <span>Plans from $5.99/mo</span>
+              </div>
               <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.9, delay: 0.44 }} className="mt-5 text-xs text-[#BEB4A7]/55">
                 Plans start at $5.99/mo — free tier available
               </m.p>
