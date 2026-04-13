@@ -28,7 +28,11 @@
       "Bash(node_modules/.bin/next build:*)",
       "Bash(node_modules/.bin/tsc:*)",
       "Bash(kill 2190 1951 1943 1925)",
-      "Bash(kill 944 906 953 897 926 871 1838 1830 1916 1924 1803 1898 2606 2588 2614 2172 2190 1925 1951 1943)"
+      "Bash(kill 944 906 953 897 926 871 1838 1830 1916 1924 1803 1898 2606 2588 2614 2172 2190 1925 1951 1943)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)",
+      "Bash(npx vercel:*)"
     ]
   }
 }
