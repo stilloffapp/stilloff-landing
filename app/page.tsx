@@ -97,7 +97,7 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.4 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-[#070605]/96 px-6"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-[#070605]/90 backdrop-blur-md px-6"
         role="dialog"
         aria-modal="true"
       >
@@ -106,15 +106,17 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.97 }}
           transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-          className="relative w-full max-w-lg"
+          className="w-full max-w-lg rounded-[2rem] border border-white/10 bg-[#0d0c0a] p-8"
         >
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="absolute -top-14 right-0 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-lg text-[#BEB4A7] transition hover:border-white/30 hover:text-[#F3EEE6]"
-          >
-            ✕
-          </button>
+          <div className="mb-6 flex justify-end">
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-sm text-[#BEB4A7] transition hover:border-white/30 hover:text-[#F3EEE6]"
+            >
+              ✕
+            </button>
+          </div>
 
         <div className="w-full text-center">
           <AnimatePresence mode="wait">
@@ -128,9 +130,10 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
             )}
 
             {phase === "breathing" && (
-              <m.div key="breathing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} className="flex flex-col items-center gap-14">
-                <BreathingOrb size={220} intense />
+              <m.div key="breathing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} className="flex flex-col items-center gap-10">
+                <BreathingOrb size={200} intense />
                 <p className="text-xs uppercase tracking-[0.28em] text-[#BEB4A7]">{label}</p>
+                <button onClick={onClose} className="mt-2 rounded-xl border border-white/10 px-6 py-2.5 text-xs font-medium text-[#BEB4A7] transition hover:border-white/20 hover:text-[#F3EEE6]">End session</button>
               </m.div>
             )}
 
@@ -151,11 +154,11 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
                   <button
                     onClick={() => {
                       onClose();
-                      document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
+                      document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" });
                     }}
                     className="cta-glow mt-3 w-full rounded-2xl bg-[#F3EEE6] px-8 py-4 text-sm font-semibold text-[#11100E] hover:opacity-90"
                   >
-                    Start free
+                    Get early access
                   </button>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
@@ -279,10 +282,10 @@ export default function Page() {
             </div>
 
             <button
-              onClick={openDemo}
+              onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
               className="cta-glow rounded-2xl bg-[#F3EEE6] px-6 py-2.5 text-sm font-semibold text-[#11100E]"
             >
-              Try the 60-second lock
+              Get early access
             </button>
           </div>
         </nav>
@@ -310,13 +313,13 @@ export default function Page() {
               <m.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.16 }} className="mt-8 max-w-xl text-xl leading-[1.4] text-[#BEB4A7] sm:text-2xl">
                 A real-time intervention that steps in before the spiral takes over.
               </m.p>
-              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.26 }} className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.26 }} className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <button onClick={openDemo} className="cta-glow rounded-2xl bg-[#F3EEE6] px-7 py-3.5 text-sm font-semibold text-[#11100E] transition hover:opacity-90">
                   Try the 60-second lock
                 </button>
-                <a href="#how-it-works" className="rounded-2xl border border-white/10 px-7 py-3.5 text-sm font-semibold text-[#F3EEE6] transition hover:border-white/20 hover:bg-white/5">
-                  See how it works
-                </a>
+                <button onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })} className="cta-glow rounded-2xl border border-white/20 px-7 py-3.5 text-sm font-semibold text-[#F3EEE6] transition hover:bg-white/5">
+                  Get early access
+                </button>
               </m.div>
               <div className="mt-6 flex items-center justify-center gap-2 text-sm text-[#BEB4A7]">
                 <span>Free plan available</span>
@@ -361,7 +364,7 @@ export default function Page() {
         <section className="relative z-10 mx-auto max-w-4xl px-6 py-28 sm:px-8 lg:px-12">
           <FadeIn>
             <p className="mb-16 max-w-2xl text-base leading-7 text-[#BEB4A7]">
-              StillOff interrupts compulsive phone use in real time by locking your phone into a guided reset before the loop takes over.
+              The loop doesn't wait for you to be ready. StillOff steps in the moment you can't stop yourself.
             </p>
           </FadeIn>
           <div className="flex flex-col gap-8">
@@ -420,9 +423,9 @@ export default function Page() {
           </FadeIn>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              ["The Lock", "When StillOff activates, the apps that fuel the spiral go quiet."],
-              ["The Reset", "breathing, silence, ambient sound"],
-              ["The Soft Landing", "A 15-minute post-session firewall keeps high-dopamine apps quiet."],
+              ["The Lock", "Silence lands before the spiral does."],
+              ["The Reset", "Sixty seconds of guided breathing. You come back to yourself."],
+              ["The Soft Landing", "After the lock lifts, there's space. Enough to make a different choice."],
               ["Learns your patterns", "StillOff steps in before you have to ask."],
             ].map(([title, body], i) => (
               <FadeIn key={title} delay={i * 0.07}>
@@ -585,9 +588,9 @@ export default function Page() {
             </div>
             <div className="grid gap-5 md:grid-cols-3">
               {[
-                { name: "Free", price: "$0", cadence: "forever", annual: null, tagline: null as string | null, features: ["1 session per day", "Basic breathing only", "No Lock. No Reset."], highlight: false, cta: null },
-                { name: "Plus", price: "$5.99", cadence: "/mo", annual: "$47.99/yr", tagline: null as string | null, features: ["Unlimited sessions", "Full Lock system", "Guided Reset", "15-min Soft Landing"], highlight: true, cta: "Start free trial" },
-                { name: "Premium", price: "$9.99", cadence: "/mo", annual: "$79.99/yr", tagline: "For when the spiral is strongest." as string | null, features: ["Everything in Plus", "Letter to My Future Self", "Therapist-curated prompts", "Private community", "Extended lock durations", "Advanced recovery modes"], highlight: false, cta: "Get Premium" },
+                { name: "Free", price: "$0", cadence: "forever", annual: null, tagline: "Just enough to feel it." as string | null, features: ["One reset per day", "Guided breathing only", "No Lock. No Soft Landing.", "No pattern learning."], highlight: false, cta: null },
+                { name: "Plus", price: "$5.99", cadence: "/mo", annual: "$47.99/yr", tagline: null as string | null, features: ["Full StillOff system", "Unlimited resets", "The Lock — silence the spiral", "Guided Reset", "15-min Soft Landing"], highlight: true, cta: "Start free trial" },
+                { name: "Premium", price: "$9.99", cadence: "/mo", annual: "$79.99/yr", tagline: "For when the spiral is strongest." as string | null, features: ["Everything in Plus", "Letter to My Future Self", "Private community", "Therapist-curated prompts", "Unlimited interventions", "Extended lock durations", "Advanced recovery modes"], highlight: false, cta: "Get Premium" },
               ].map((tier) => (
                 <div key={tier.name} className={`relative flex flex-col rounded-[1.5rem] border px-5 py-7 ${tier.highlight ? "border-[#6E4637]/40 bg-[#F3EEE6] text-[#11100E]" : "border-white/8 bg-white/[0.02] text-[#F3EEE6]"}`}>
                   {tier.highlight && <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#6E4637] px-4 py-1 text-[9px] uppercase tracking-[0.2em] text-[#F3EEE6]">Most Popular</div>}
@@ -655,10 +658,10 @@ export default function Page() {
               animate={{ opacity: 0.85 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              onClick={openDemo}
+              onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
               className="cta-glow fixed bottom-4 right-4 z-50 rounded-full border border-white/10 bg-[#11100E]/90 px-5 py-2.5 text-xs font-semibold text-[#F3EEE6] backdrop-blur-md transition hover:border-white/20 md:bottom-6 md:left-6 md:right-auto"
             >
-              Lock it now
+              Join waitlist
             </m.button>
           )}
         </AnimatePresence>
