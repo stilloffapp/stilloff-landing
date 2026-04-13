@@ -106,17 +106,16 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.97 }}
           transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-          className="w-full max-w-lg rounded-[2rem] border border-white/10 bg-[#0d0c0a] p-8"
+          className="relative w-full max-w-lg rounded-[2rem] border border-white/10 bg-[#0d0c0a] p-8 pt-14"
         >
-          <div className="mb-6 flex justify-end">
-            <button
-              onClick={onClose}
-              aria-label="Close"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-sm text-[#BEB4A7] transition hover:border-white/30 hover:text-[#F3EEE6]"
-            >
-              ✕
-            </button>
-          </div>
+          {/* Close button — large, top-right, always visible */}
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="absolute right-5 top-5 flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/[0.04] text-base text-[#BEB4A7] transition hover:border-white/35 hover:bg-white/[0.08] hover:text-[#F3EEE6]"
+          >
+            ✕
+          </button>
 
         <div className="w-full text-center">
           <AnimatePresence mode="wait">
@@ -130,10 +129,10 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
             )}
 
             {phase === "breathing" && (
-              <m.div key="breathing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} className="flex flex-col items-center gap-10">
+              <m.div key="breathing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} className="flex flex-col items-center">
                 <BreathingOrb size={200} intense />
-                <p className="text-xs uppercase tracking-[0.28em] text-[#BEB4A7]">{label}</p>
-                <button onClick={onClose} className="mt-2 rounded-xl border border-white/10 px-6 py-2.5 text-xs font-medium text-[#BEB4A7] transition hover:border-white/20 hover:text-[#F3EEE6]">End session</button>
+                <p className="mt-10 text-xs uppercase tracking-[0.28em] text-[#BEB4A7]">{label}</p>
+                <button onClick={onClose} className="mt-8 rounded-xl border border-white/10 px-6 py-2.5 text-xs font-medium text-[#BEB4A7] transition hover:border-white/20 hover:text-[#F3EEE6]">End session</button>
               </m.div>
             )}
 
@@ -588,9 +587,55 @@ export default function Page() {
             </div>
             <div className="grid gap-5 md:grid-cols-3">
               {[
-                { name: "Free", price: "$0", cadence: "forever", annual: null, tagline: "Just enough to feel it." as string | null, features: ["One reset per day", "Guided breathing only", "No Lock. No Soft Landing.", "No pattern learning."], highlight: false, cta: null },
-                { name: "Plus", price: "$5.99", cadence: "/mo", annual: "$47.99/yr", tagline: null as string | null, features: ["Full StillOff system", "Unlimited resets", "The Lock — silence the spiral", "Guided Reset", "15-min Soft Landing"], highlight: true, cta: "Start free trial" },
-                { name: "Premium", price: "$9.99", cadence: "/mo", annual: "$79.99/yr", tagline: "For when the spiral is strongest." as string | null, features: ["Everything in Plus", "Letter to My Future Self", "Private community", "Therapist-curated prompts", "Unlimited interventions", "Extended lock durations", "Advanced recovery modes"], highlight: false, cta: "Get Premium" },
+                {
+                  name: "Free",
+                  price: "$0",
+                  cadence: "forever",
+                  annual: null,
+                  tagline: "A limited taste — incomplete on purpose." as string | null,
+                  features: [
+                    "3 resets per day",
+                    "Guided breathing only",
+                    "No Lock, no Soft Landing",
+                    "No pattern learning",
+                  ],
+                  highlight: false,
+                  cta: null,
+                },
+                {
+                  name: "Plus",
+                  price: "$5.99",
+                  cadence: "/mo",
+                  annual: "$47.99/yr",
+                  tagline: "The core, complete product." as string | null,
+                  features: [
+                    "Full StillOff system",
+                    "Unlimited resets",
+                    "The Lock — silence the spiral",
+                    "Guided breathing Reset",
+                    "15-min Soft Landing",
+                  ],
+                  highlight: true,
+                  cta: "Start free trial",
+                },
+                {
+                  name: "Premium",
+                  price: "$9.99",
+                  cadence: "/mo",
+                  annual: "$79.99/yr",
+                  tagline: "For when the spiral is strongest." as string | null,
+                  features: [
+                    "Everything in Plus",
+                    "Letter to My Future Self",
+                    "Private community",
+                    "Therapist-curated prompts",
+                    "Unlimited interventions",
+                    "Extended lock durations",
+                    "Advanced recovery modes",
+                  ],
+                  highlight: false,
+                  cta: "Get Premium",
+                },
               ].map((tier) => (
                 <div key={tier.name} className={`relative flex flex-col rounded-[1.5rem] border px-5 py-7 ${tier.highlight ? "border-[#6E4637]/40 bg-[#F3EEE6] text-[#11100E]" : "border-white/8 bg-white/[0.02] text-[#F3EEE6]"}`}>
                   {tier.highlight && <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#6E4637] px-4 py-1 text-[9px] uppercase tracking-[0.2em] text-[#F3EEE6]">Most Popular</div>}
