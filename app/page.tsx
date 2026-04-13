@@ -96,19 +96,27 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.35 }}
+        transition={{ duration: 0.4 }}
         className="fixed inset-0 z-[100] flex items-center justify-center bg-[#070605]/96 px-6"
         role="dialog"
         aria-modal="true"
       >
-        <button
-          onClick={onClose}
-          className="absolute right-5 top-5 rounded-full border border-white/10 px-3 py-1.5 text-xs text-[#BEB4A7] transition hover:border-white/20 hover:text-[#F3EEE6]"
+        <m.div
+          initial={{ opacity: 0, scale: 0.97, y: 8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.97 }}
+          transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+          className="relative w-full max-w-lg"
         >
-          Close
-        </button>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="absolute -top-14 right-0 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-lg text-[#BEB4A7] transition hover:border-white/30 hover:text-[#F3EEE6]"
+          >
+            ✕
+          </button>
 
-        <div className="w-full max-w-lg text-center">
+        <div className="w-full text-center">
           <AnimatePresence mode="wait">
             {(phase === "intro" || phase === "lock") && (
               <m.div key="intro" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.5 }} className="space-y-8">
@@ -120,8 +128,8 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
             )}
 
             {phase === "breathing" && (
-              <m.div key="breathing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} className="flex flex-col items-center gap-10">
-                <BreathingOrb size={280} intense />
+              <m.div key="breathing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} className="flex flex-col items-center gap-14">
+                <BreathingOrb size={220} intense />
                 <p className="text-xs uppercase tracking-[0.28em] text-[#BEB4A7]">{label}</p>
               </m.div>
             )}
@@ -172,6 +180,7 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
             )}
           </AnimatePresence>
         </div>
+        </m.div>
       </m.div>
     </AnimatePresence>
   );
@@ -314,9 +323,6 @@ export default function Page() {
                 <span className="text-[#6E4637]">•</span>
                 <span>Plans from $5.99/mo</span>
               </div>
-              <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.9, delay: 0.44 }} className="mt-5 text-xs text-[#BEB4A7]/55">
-                Plans start at $5.99/mo — free tier available
-              </m.p>
             </div>
 
             {/* right — phone + orb */}
@@ -579,9 +585,9 @@ export default function Page() {
             </div>
             <div className="grid gap-5 md:grid-cols-3">
               {[
-                { name: "Free", price: "$0", cadence: "forever", annual: null, features: ["3-min sessions", "Zen & Break modes", "Basic streak"], highlight: false, cta: null },
-                { name: "Plus", price: "$5.99", cadence: "/mo", annual: "$47.99/yr", features: ["Hard Lock", "Guided Reset", "Soft Landing"], highlight: true, cta: "Start free trial" },
-                { name: "Premium", price: "$9.99", cadence: "/mo", annual: "$79.99/yr", features: ["Everything in Plus", "Hard Lock Mode", "App Firewall"], highlight: false, cta: "Get Premium" },
+                { name: "Free", price: "$0", cadence: "forever", annual: null, tagline: null as string | null, features: ["1 session per day", "Basic breathing only", "No Lock. No Reset."], highlight: false, cta: null },
+                { name: "Plus", price: "$5.99", cadence: "/mo", annual: "$47.99/yr", tagline: null as string | null, features: ["Unlimited sessions", "Full Lock system", "Guided Reset", "15-min Soft Landing"], highlight: true, cta: "Start free trial" },
+                { name: "Premium", price: "$9.99", cadence: "/mo", annual: "$79.99/yr", tagline: "For when the spiral is strongest." as string | null, features: ["Everything in Plus", "Letter to My Future Self", "Therapist-curated prompts", "Private community", "Extended lock durations", "Advanced recovery modes"], highlight: false, cta: "Get Premium" },
               ].map((tier) => (
                 <div key={tier.name} className={`relative flex flex-col rounded-[1.5rem] border px-5 py-7 ${tier.highlight ? "border-[#6E4637]/40 bg-[#F3EEE6] text-[#11100E]" : "border-white/8 bg-white/[0.02] text-[#F3EEE6]"}`}>
                   {tier.highlight && <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#6E4637] px-4 py-1 text-[9px] uppercase tracking-[0.2em] text-[#F3EEE6]">Most Popular</div>}
@@ -591,6 +597,7 @@ export default function Page() {
                     <span className={`mb-1 text-sm ${tier.highlight ? "text-[#8A5848]" : "text-[#BEB4A7]"}`}>{tier.cadence}</span>
                   </div>
                   {tier.annual && <p className={`mt-1 text-xs ${tier.highlight ? "text-[#8A5848]" : "text-[#BEB4A7]"}`}>{tier.annual}</p>}
+                  {tier.tagline && <p className="mt-3 text-sm italic text-[#BEB4A7]">{tier.tagline}</p>}
                   <div className="mt-5 flex-1 space-y-2.5">
                     {tier.features.map((f) => (
                       <div key={f} className={`flex items-start gap-2 text-sm ${tier.highlight ? "text-[#6E4637]" : "text-[#BEB4A7]"}`}>
