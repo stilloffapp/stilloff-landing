@@ -97,7 +97,7 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.4 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-[#070605]/90 backdrop-blur-md px-6"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-[#070605]/95 backdrop-blur-md px-6"
         role="dialog"
         aria-modal="true"
       >
@@ -106,7 +106,7 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.97 }}
           transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-          className="relative w-full max-w-lg rounded-[2rem] border border-white/10 bg-[#0d0c0a] p-8 pt-14"
+          className="relative w-full max-w-lg overflow-hidden rounded-[2rem] border border-white/10 bg-[#0d0c0a] p-8 pt-16"
         >
           {/* Close button — large, top-right, always visible */}
           <button
@@ -117,7 +117,7 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
             ✕
           </button>
 
-        <div className="w-full text-center">
+        <div className="flex w-full flex-col items-center justify-center text-center" style={{ minHeight: 380 }}>
           <AnimatePresence mode="wait">
             {(phase === "intro" || phase === "lock") && (
               <m.div key="intro" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.5 }} className="space-y-8">
@@ -129,9 +129,11 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
             )}
 
             {phase === "breathing" && (
-              <m.div key="breathing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} className="flex flex-col items-center">
-                <BreathingOrb size={200} intense />
-                <p className="mt-10 text-xs uppercase tracking-[0.28em] text-[#BEB4A7]">{label}</p>
+              <m.div key="breathing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} className="flex flex-col items-center gap-0">
+                <div style={{ position: "relative", zIndex: 0 }}>
+                  <BreathingOrb size={180} intense />
+                </div>
+                <p className="mt-14 text-xs uppercase tracking-[0.28em] text-[#BEB4A7]">{label}</p>
                 <button onClick={onClose} className="mt-8 rounded-xl border border-white/10 px-6 py-2.5 text-xs font-medium text-[#BEB4A7] transition hover:border-white/20 hover:text-[#F3EEE6]">End session</button>
               </m.div>
             )}
@@ -316,7 +318,7 @@ export default function Page() {
                 <button onClick={openDemo} className="cta-glow rounded-2xl bg-[#F3EEE6] px-7 py-3.5 text-sm font-semibold text-[#11100E] transition hover:opacity-90">
                   Try the 60-second lock
                 </button>
-                <button onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })} className="cta-glow rounded-2xl border border-white/20 px-7 py-3.5 text-sm font-semibold text-[#F3EEE6] transition hover:bg-white/5">
+                <button onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })} className="rounded-2xl border border-white/20 px-7 py-3.5 text-sm font-semibold text-[#F3EEE6] transition hover:bg-white/5">
                   Get early access
                 </button>
               </m.div>
@@ -362,19 +364,13 @@ export default function Page() {
         ══════════════════════════════════════════════════ */}
         <section className="relative z-10 mx-auto max-w-4xl px-6 py-28 sm:px-8 lg:px-12">
           <FadeIn>
-            <p className="mb-16 max-w-2xl text-base leading-7 text-[#BEB4A7]">
-              The loop doesn't wait for you to be ready. StillOff steps in the moment you can't stop yourself.
+            <p style={{ fontFamily: "var(--font-cormorant, Georgia, serif)" }} className="max-w-2xl text-4xl leading-[1.15] tracking-[-0.03em] text-[#F3EEE6] sm:text-5xl">
+              You didn&rsquo;t decide to spiral. It was already happening&nbsp;&mdash; the moment you picked it up.
+            </p>
+            <p className="mt-8 max-w-xl text-base leading-7 text-[#BEB4A7]">
+              StillOff steps in at that exact moment. Before the loop closes. Before the next ten minutes disappear.
             </p>
           </FadeIn>
-          <div className="flex flex-col gap-8">
-            {["Unlock.", "Check.", "Refresh.", "Switch apps.", "Repeat.", "Ten minutes disappear.", "Not because you wanted to.", "Because the loop already started."].map((line, i) => (
-              <m.div key={line} initial={{ opacity: 0, x: -12 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.8 }} transition={{ duration: 0.75, delay: i * 0.1, ease: [0.4, 0, 0.2, 1] }}>
-                <span style={{ fontFamily: "var(--font-cormorant, Georgia, serif)" }} className="text-4xl text-[#F3EEE6] tracking-[-0.03em]">
-                  {line}
-                </span>
-              </m.div>
-            ))}
-          </div>
         </section>
 
         {/* ══════════════════════════════════════════════════
