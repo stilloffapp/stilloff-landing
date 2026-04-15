@@ -1313,7 +1313,7 @@ export default function Home() {
 
       {/* ══ STICKY CTA ═══════════════════════════════════════════════════════ */}
       <AnimatePresence>
-        {showSticky && (
+        {showSticky && !submitted && (
           <motion.button
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1371,12 +1371,7 @@ export default function Home() {
               { "@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free" },
               { "@type": "Offer", "price": "5.99", "priceCurrency": "USD", "name": "Plus" },
               { "@type": "Offer", "price": "9.99", "priceCurrency": "USD", "name": "Premium" }
-            ],
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.9",
-              "ratingCount": "124"
-            }
+            ]
           }),
         }}
       />
