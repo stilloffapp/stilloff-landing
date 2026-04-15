@@ -1307,7 +1307,7 @@ export default function Home() {
             <a href="/terms" className="hover:text-[#F4EFE8] transition-colors">Terms</a>
             <a href="mailto:hello@stilloff.com" className="hover:text-[#F4EFE8] transition-colors">Contact</a>
           </div>
-          <p className="text-xs" style={{ color: "#564E46" }}>© 2025 StillOff</p>
+          <p className="text-xs" style={{ color: "#564E46" }}>© 2026 StillOff</p>
         </div>
       </footer>
 
