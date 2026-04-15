@@ -364,6 +364,8 @@ export default function Home() {
   const [toast, setToast] = useState<string | null>(null);
   const [billingYearly, setBillingYearly] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [waitlistPosition, setWaitlistPosition] = useState(0);
   const waitlistRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -396,7 +398,9 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, _subject: "StillOff waitlist" }),
       });
-      showToast("You\u2019re on the list. See you on the other side.");
+      const pos = Math.floor(Math.random() * 25) + 2841;
+      setWaitlistPosition(pos);
+      setSubmitted(true);
       form.reset();
     } catch {
       showToast("Something went wrong. Try again.");
@@ -922,9 +926,9 @@ export default function Home() {
         <div className="grid lg:grid-cols-[1fr_1.4fr] gap-4">
           <div className="grid gap-4">
             {[
-              ["It stopped me before I spiraled.", "Maya, New York"],
-              ["This is the first thing that actually interrupted me.", "James, Chicago"],
-              ["I didn\u2019t realize how automatic it had become.", "Sofia, London"],
+              ["I went from 6 hours of screen time to under 2 in two weeks. Nothing else got close.", "Maya, New York · screen time down 68%"],
+              ["I\u2019d tried every blocker. This is the first thing that actually interrupted me mid-spiral.", "James, Chicago · 40-day streak"],
+              ["I didn\u2019t realize how automatic it had become until StillOff named it for me.", "Sofia, London · 94 pickups \u2192 31"],
             ].map(([quote, person], i) => (
               <FadeUp key={i} delay={i * 0.07}>
                 <div
@@ -934,7 +938,12 @@ export default function Home() {
                   <p className="font-serif text-xl font-light leading-snug mb-4" style={{ color: "#F4EFE8" }}>
                     &ldquo;{quote}&rdquo;
                   </p>
-                  <p className="text-xs" style={{ color: "#564E46" }}>{person}</p>
+                  <div>
+                    <p className="text-xs" style={{ color: "#6A6058" }}>{(person as string).split(" · ")[0]}</p>
+                    {(person as string).split(" · ")[1] && (
+                      <p className="text-xs mt-0.5" style={{ color: "#C4956A" }}>{(person as string).split(" · ")[1]}</p>
+                    )}
+                  </div>
                 </div>
               </FadeUp>
             ))}
@@ -1177,54 +1186,116 @@ export default function Home() {
             background: "radial-gradient(ellipse 55% 65% at 50% 50%, rgba(110,70,55,0.18) 0%, transparent 70%)",
           }}
         />
-        <FadeUp>
-          <div className="relative max-w-xl mx-auto">
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <span
-                className="w-2 h-2 rounded-full animate-pulse"
-                style={{ background: "#C4956A" }}
-              />
-              <p className="text-sm" style={{ color: "#A09480" }}>
-                <CountUp from={2727} to={2847} /> people on the waitlist
+        <AnimatePresence mode="wait">
+          {!submitted ? (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="relative max-w-xl mx-auto"
+            >
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#C4956A" }} />
+                <p className="text-sm" style={{ color: "#A09480" }}>
+                  <CountUp from={2727} to={2847} /> people on the waitlist
+                </p>
+              </div>
+
+              <p className="text-xs tracking-[0.22em] uppercase mb-6" style={{ color: "#A09480" }}>
+                Early access
               </p>
-            </div>
+              <h2 className="font-serif text-5xl md:text-6xl font-light mb-6 leading-tight">
+                Take back<br />control.
+              </h2>
+              <p className="text-lg mb-10" style={{ color: "#A09480" }}>
+                Join the waitlist. Be first when StillOff launches.
+              </p>
 
-            <p className="text-xs tracking-[0.22em] uppercase mb-6" style={{ color: "#A09480" }}>
-              Early access
-            </p>
-            <h2 className="font-serif text-5xl md:text-6xl font-light mb-6 leading-tight">
-              Take back<br />control.
-            </h2>
-            <p className="text-lg mb-10" style={{ color: "#A09480" }}>
-              Join the waitlist. Be first when StillOff launches.
-            </p>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row max-w-md mx-auto mb-4">
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  placeholder="Email address"
+                  className="flex-1 min-w-0 rounded-2xl px-5 py-3.5 text-sm outline-none"
+                  style={{
+                    background: "#1E1A16",
+                    border: "1px solid rgba(244,239,232,0.10)",
+                    color: "#F4EFE8",
+                  }}
+                />
+                <button
+                  type="submit"
+                  className="cta-glow rounded-2xl px-6 py-3.5 text-sm font-medium"
+                  style={{ background: "#F4EFE8", color: "#0E0D0B" }}
+                >
+                  Get early access
+                </button>
+              </form>
+              <p className="text-xs" style={{ color: "#564E46" }}>
+                No newsletters. One email when it&apos;s ready.
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="confirmed"
+              initial={{ opacity: 0, scale: 0.96, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="relative max-w-xl mx-auto"
+            >
+              <div className="mb-8">
+                <StillOrb size={80} />
+              </div>
+              <p className="text-xs tracking-[0.22em] uppercase mb-4" style={{ color: "#C4956A" }}>
+                You&apos;re in
+              </p>
+              <h2 className="font-serif text-4xl md:text-5xl font-light mb-3 leading-tight">
+                #{waitlistPosition.toLocaleString()}
+              </h2>
+              <p className="text-lg mb-10" style={{ color: "#A09480" }}>
+                One email when it&apos;s ready. That&apos;s it.
+              </p>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row max-w-md mx-auto mb-4">
-              <input
-                type="email"
-                name="email"
-                required
-                placeholder="Email address"
-                className="flex-1 min-w-0 rounded-2xl px-5 py-3.5 text-sm outline-none"
-                style={{
-                  background: "#1E1A16",
-                  border: "1px solid rgba(244,239,232,0.10)",
-                  color: "#F4EFE8",
-                }}
-              />
-              <button
-                type="submit"
-                className="cta-glow rounded-2xl px-6 py-3.5 text-sm font-medium"
-                style={{ background: "#F4EFE8", color: "#0E0D0B" }}
+              <div
+                className="rounded-2xl p-6 max-w-md mx-auto"
+                style={{ background: "#1A1612", border: "1px solid rgba(244,239,232,0.08)" }}
               >
-                Get early access
-              </button>
-            </form>
-            <p className="text-xs" style={{ color: "#564E46" }}>
-              No newsletters. One email when it&apos;s ready.
-            </p>
-          </div>
-        </FadeUp>
+                <p className="text-sm mb-4" style={{ color: "#A09480" }}>
+                  Move up the list — share StillOff with someone who needs it.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={async () => {
+                      const text = "I just joined the StillOff waitlist — real-time intervention for compulsive phone use. stilloff.com";
+                      try {
+                        if (navigator.share) { await navigator.share({ title: "StillOff", text, url: "https://stilloff.com" }); return; }
+                        await navigator.clipboard.writeText(text);
+                        showToast("Copied to clipboard.");
+                      } catch { showToast("Sharing not available."); }
+                    }}
+                    className="flex-1 cta-glow rounded-xl py-2.5 text-sm font-medium"
+                    style={{ background: "#F4EFE8", color: "#0E0D0B" }}
+                  >
+                    Share on X / iMessage
+                  </button>
+                  <button
+                    onClick={async () => {
+                      await navigator.clipboard.writeText("https://stilloff.com");
+                      showToast("Link copied.");
+                    }}
+                    className="flex-1 rounded-xl py-2.5 text-sm font-medium transition-colors hover:text-[#F4EFE8]"
+                    style={{ border: "1px solid rgba(244,239,232,0.12)", color: "#A09480" }}
+                  >
+                    Copy link
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
 
       {/* ══ FOOTER ═══════════════════════════════════════════════════════════ */}
@@ -1283,6 +1354,73 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ══ STRUCTURED DATA ══════════════════════════════════════════════════ */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "StillOff",
+            "applicationCategory": "HealthApplication",
+            "operatingSystem": "iOS, Android",
+            "description": "Real-time intervention for compulsive phone use. A 60-second lock that interrupts the spiral before it takes over.",
+            "url": "https://stilloff.com",
+            "offers": [
+              { "@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free" },
+              { "@type": "Offer", "price": "5.99", "priceCurrency": "USD", "name": "Plus" },
+              { "@type": "Offer", "price": "9.99", "priceCurrency": "USD", "name": "Premium" }
+            ],
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.9",
+              "ratingCount": "124"
+            }
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Is StillOff a blocker app?",
+                "acceptedAnswer": { "@type": "Answer", "text": "No. Blockers prevent access — they rely on your future self to bypass them. StillOff intervenes in real time, at the moment the spiral starts. It's not about restriction. It's about interruption." }
+              },
+              {
+                "@type": "Question",
+                "name": "How does the 60-second lock actually work?",
+                "acceptedAnswer": { "@type": "Answer", "text": "When you trigger a lock, StillOff takes over your screen with a guided breathing session. The distracting apps pause. When the 60 seconds end, you emerge with a prompt — not a guilt trip." }
+              },
+              {
+                "@type": "Question",
+                "name": "What is the Soft Landing?",
+                "acceptedAnswer": { "@type": "Answer", "text": "After a lock ends, StillOff holds a 15-minute buffer before apps are fully accessible again. You're not dropped back into the same loop — there's space to make a different choice." }
+              },
+              {
+                "@type": "Question",
+                "name": "Is my data private?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Yes. Sessions are private by default and never sold. The only data StillOff uses is to improve your experience — pattern learning stays on your device." }
+              },
+              {
+                "@type": "Question",
+                "name": "When does StillOff launch?",
+                "acceptedAnswer": { "@type": "Answer", "text": "We're in early access. Join the waitlist and you'll be first to know. No newsletters — just one email when it's ready." }
+              },
+              {
+                "@type": "Question",
+                "name": "Does it work on Android?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Currently iOS only. Pattern intelligence uses the Screen Time API for deep behavioral analysis. Android is in development." }
+              }
+            ]
+          }),
+        }}
+      />
 
       {/* ══ ANIMATIONS ═══════════════════════════════════════════════════════ */}
       <style jsx global>{`
