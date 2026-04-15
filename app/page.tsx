@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { motion, useInView, AnimatePresence, useReducedMotion } from "framer-motion";
 
 /* ─── Scroll-reveal wrapper ─────────────────────────────────────────────── */
 function FadeUp({
@@ -28,14 +28,30 @@ function FadeUp({
   );
 }
 
+/* ─── CountUp ───────────────────────────────────────────────────────────── */
+function CountUp({ from, to, duration = 1.6 }: { from: number; to: number; duration?: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true });
+  const [value, setValue] = useState(from);
+
+  useEffect(() => {
+    if (!inView) return;
+    const start = performance.now();
+    const range = to - from;
+    const tick = (now: number) => {
+      const t = Math.min((now - start) / (duration * 1000), 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      setValue(Math.round(from + range * ease));
+      if (t < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [inView, from, to, duration]);
+
+  return <span ref={ref}>{value.toLocaleString()}</span>;
+}
+
 /* ─── Breathing Orb ─────────────────────────────────────────────────────── */
-function StillOrb({
-  size = 280,
-  intense = false,
-}: {
-  size?: number;
-  intense?: boolean;
-}) {
+function StillOrb({ size = 280, intense = false }: { size?: number; intense?: boolean }) {
   const dur = intense ? "3.6s" : "5.8s";
   return (
     <div
@@ -43,37 +59,31 @@ function StillOrb({
       style={{ width: size, height: size }}
       aria-hidden
     >
-      {/* outer atmospheric bloom */}
       <div
         style={{
           position: "absolute",
           inset: `-${size * 0.35}px`,
           borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(110,70,55,0.42) 0%, rgba(196,149,106,0.16) 40%, transparent 72%)",
+          background: "radial-gradient(circle, rgba(110,70,55,0.42) 0%, rgba(196,149,106,0.16) 40%, transparent 72%)",
           filter: `blur(${size * 0.14}px)`,
           animation: `orb-breathe ${dur} ease-in-out infinite`,
         }}
       />
-      {/* mid shell */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(130,82,62,0.72) 0%, rgba(96,55,40,0.58) 45%, rgba(50,28,18,0.28) 70%, transparent 100%)",
+          background: "radial-gradient(circle, rgba(130,82,62,0.72) 0%, rgba(96,55,40,0.58) 45%, rgba(50,28,18,0.28) 70%, transparent 100%)",
           animation: `orb-breathe ${dur} ease-in-out infinite`,
         }}
       />
-      {/* luminous core */}
       <div
         style={{
           position: "absolute",
           inset: `${size * 0.22}px`,
           borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(225,175,120,0.78) 0%, rgba(170,108,76,0.64) 38%, rgba(120,78,58,0.34) 70%, transparent 100%)",
+          background: "radial-gradient(circle, rgba(225,175,120,0.78) 0%, rgba(170,108,76,0.64) 38%, rgba(120,78,58,0.34) 70%, transparent 100%)",
           animation: `orb-core ${dur} ease-in-out infinite`,
         }}
       />
@@ -81,20 +91,417 @@ function StillOrb({
   );
 }
 
+/* ─── Soft Landing Countdown ────────────────────────────────────────────── */
+function SoftLandingCard() {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: false });
+  const [secs, setSecs] = useState(14 * 60 + 32);
+  const total = 14 * 60 + 32;
+
+  useEffect(() => {
+    if (!inView) return;
+    const id = setInterval(() => setSecs((s) => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(id);
+  }, [inView]);
+
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  const display = `${m}:${String(s).padStart(2, "0")}`;
+
+  return (
+    <div
+      ref={ref}
+      className="rounded-2xl p-8"
+      style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.08)" }}
+    >
+      <p className="text-xs tracking-[0.22em] uppercase mb-3" style={{ color: "#A09480" }}>
+        Soft Landing active
+      </p>
+      <div className="font-serif text-6xl font-light mb-3" style={{ color: "#C4956A" }}>
+        {display}
+      </div>
+      <p className="text-sm leading-relaxed mb-6" style={{ color: "#6A6058" }}>
+        Apps resuming in {m} minute{m !== 1 ? "s" : ""}.
+        <br />
+        The door is here — you don't have to open it yet.
+      </p>
+      <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(244,239,232,0.06)" }}>
+        <div
+          className="h-full rounded-full transition-all duration-1000"
+          style={{
+            width: `${(secs / total) * 100}%`,
+            background: "linear-gradient(90deg, rgba(196,149,106,0.5), rgba(196,149,106,0.8))",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ─── Demo Modal ─────────────────────────────────────────────────────────── */
+function DemoModal({
+  open,
+  onClose,
+  onComplete,
+  onSubmit,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onComplete: () => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+}) {
+  const reduced = useReducedMotion();
+  const [phase, setPhase] = useState<"intro" | "breathing" | "ending" | "cta">("intro");
+  const [label, setLabel] = useState("Breathe in");
+
+  useEffect(() => {
+    if (!open) {
+      setTimeout(() => { setPhase("intro"); setLabel("Breathe in"); }, 400);
+      return;
+    }
+    document.body.style.overflow = "hidden";
+    const breathMs = reduced ? 5000 : 60000;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    timers.push(setTimeout(() => setPhase("breathing"), 1200));
+
+    if (!reduced) {
+      const cycles = ["Breathe in", "Hold", "Breathe out", "Hold"];
+      const durations = [4000, 2000, 4000, 2000];
+      let elapsed = 1200;
+      while (elapsed < 1200 + breathMs) {
+        for (let i = 0; i < cycles.length; i++) {
+          const e = elapsed;
+          const lbl = cycles[i];
+          timers.push(setTimeout(() => setLabel(lbl), e));
+          elapsed += durations[i];
+          if (elapsed >= 1200 + breathMs) break;
+        }
+      }
+    }
+
+    timers.push(setTimeout(() => setPhase("ending"), 1200 + breathMs));
+    timers.push(setTimeout(() => { setPhase("cta"); onComplete(); }, 1200 + breathMs + 3500));
+
+    return () => {
+      document.body.style.overflow = "";
+      timers.forEach(clearTimeout);
+    };
+  }, [open, reduced, onComplete]);
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          key="backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-50 flex items-center justify-center px-6"
+          style={{ background: "rgba(0,0,0,0.92)", backdropFilter: "blur(16px)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+        >
+          <motion.div
+            key="card"
+            initial={{ opacity: 0, scale: 0.94, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.94, y: 16 }}
+            transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+            className="relative rounded-3xl p-10 max-w-md w-full text-center overflow-hidden"
+            style={{ background: "#1A1612", border: "1px solid rgba(244,239,232,0.10)" }}
+          >
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: "radial-gradient(ellipse 80% 50% at 50% 110%, rgba(110,70,55,0.26) 0%, transparent 65%)",
+              }}
+            />
+
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full transition-colors text-lg"
+              style={{ background: "rgba(244,239,232,0.07)", color: "#A09480" }}
+              aria-label="Close"
+            >
+              ×
+            </button>
+
+            <div className="relative flex flex-col items-center" style={{ minHeight: 340 }}>
+              <AnimatePresence mode="wait">
+                {phase === "intro" && (
+                  <motion.div
+                    key="intro"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex flex-col items-center justify-center pt-6"
+                  >
+                    <p className="text-xs tracking-[0.22em] uppercase mb-7" style={{ color: "#A09480" }}>
+                      Lock starting…
+                    </p>
+                    <h2 className="font-serif text-3xl font-light leading-snug max-w-xs">
+                      For the next minute, your phone becomes a reset space.
+                    </h2>
+                  </motion.div>
+                )}
+
+                {phase === "breathing" && (
+                  <motion.div
+                    key="breathing"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className="flex flex-col items-center gap-6"
+                  >
+                    <StillOrb size={120} intense />
+                    <p className="text-xs tracking-[0.26em] uppercase" style={{ color: "#A09480" }}>
+                      {label}
+                    </p>
+                    <button
+                      onClick={onClose}
+                      className="mt-2 text-xs px-5 py-2 rounded-xl border transition-colors"
+                      style={{ borderColor: "rgba(244,239,232,0.12)", color: "#6A6058" }}
+                    >
+                      End session
+                    </button>
+                  </motion.div>
+                )}
+
+                {phase === "ending" && (
+                  <motion.div
+                    key="ending"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.6 }}
+                    className="flex flex-col items-center justify-center pt-8 gap-3"
+                  >
+                    <p className="font-serif text-4xl font-light">You didn&apos;t check.</p>
+                    <p className="text-lg" style={{ color: "#A09480" }}>Nothing happened.</p>
+                    <p className="text-lg" style={{ color: "#A09480" }}>That&apos;s the point.</p>
+                  </motion.div>
+                )}
+
+                {phase === "cta" && (
+                  <motion.div
+                    key="cta"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className="flex flex-col items-center w-full"
+                  >
+                    <p className="font-serif text-3xl font-light mb-2">That felt different.</p>
+                    <p className="text-base mb-6" style={{ color: "#A09480" }}>
+                      That&apos;s what control feels like.
+                    </p>
+                    <div
+                      className="w-full rounded-2xl p-5 mb-4 text-left"
+                      style={{
+                        background: "rgba(244,239,232,0.04)",
+                        border: "1px solid rgba(244,239,232,0.08)",
+                      }}
+                    >
+                      <p className="text-xs tracking-[0.18em] uppercase mb-3" style={{ color: "#A09480" }}>
+                        Be first when StillOff launches
+                      </p>
+                      <form onSubmit={onSubmit} className="flex flex-col gap-2 sm:flex-row">
+                        <input
+                          type="email"
+                          name="email"
+                          required
+                          placeholder="Email address"
+                          className="flex-1 min-w-0 rounded-xl px-4 py-2.5 text-sm outline-none"
+                          style={{
+                            background: "#13110E",
+                            border: "1px solid rgba(244,239,232,0.10)",
+                            color: "#F4EFE8",
+                          }}
+                        />
+                        <button
+                          type="submit"
+                          className="cta-glow rounded-xl px-5 py-2.5 text-sm font-medium"
+                          style={{ background: "#F4EFE8", color: "#0E0D0B" }}
+                        >
+                          Join
+                        </button>
+                      </form>
+                      <p className="text-xs mt-2" style={{ color: "#564E46" }}>
+                        No newsletters. One email when it&apos;s ready.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        onClose();
+                        setTimeout(
+                          () => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" }),
+                          350
+                        );
+                      }}
+                      className="text-sm transition-colors hover:text-[#F4EFE8]"
+                      style={{ color: "#6A6058" }}
+                    >
+                      See pricing →
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 /* ─── Page ──────────────────────────────────────────────────────────────── */
 export default function Home() {
   const [demoOpen, setDemoOpen] = useState(false);
-  const [phase, setPhase] = useState<"idle" | "locking" | "done">("idle");
+  const [demoCompleted, setDemoCompleted] = useState(false);
+  const [showSticky, setShowSticky] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const [billingYearly, setBillingYearly] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const waitlistRef = useRef<HTMLElement | null>(null);
 
-  function startDemo() {
+  useEffect(() => {
+    try { setDemoCompleted(sessionStorage.getItem("stilloff-demo-complete") === "true"); } catch { /* noop */ }
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const waitlistTop = waitlistRef.current?.getBoundingClientRect().top ?? Infinity;
+      setShowSticky(y / max > 0.18 && waitlistTop > window.innerHeight * 0.85);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const showToast = useCallback((msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3500);
+  }, []);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const email = (form.elements.namedItem("email") as HTMLInputElement)?.value;
+    try {
+      await fetch("https://formspree.io/f/mzdklnwv", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, _subject: "StillOff waitlist" }),
+      });
+      showToast("You\u2019re on the list. See you on the other side.");
+      form.reset();
+    } catch {
+      showToast("Something went wrong. Try again.");
+    }
+  }, [showToast]);
+
+  const handleShare = useCallback(async () => {
+    const text = "I sat with the loop for 12 minutes today. I didn\u2019t look away.";
+    const url = typeof window !== "undefined" ? window.location.href : "https://stilloff.com";
+    try {
+      if (navigator.share) { await navigator.share({ title: "StillOff", text, url }); return; }
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      showToast("Copied to clipboard.");
+    } catch {
+      showToast("Sharing not available.");
+    }
+  }, [showToast]);
+
+  function openDemo() {
     setDemoOpen(true);
-    setPhase("locking");
-    setTimeout(() => setPhase("done"), 4000);
   }
-  function closeDemo() {
+
+  function handleDemoClose() {
     setDemoOpen(false);
-    setTimeout(() => setPhase("idle"), 400);
   }
+
+  const handleDemoComplete = useCallback(() => {
+    setDemoCompleted(true);
+    try { sessionStorage.setItem("stilloff-demo-complete", "true"); } catch { /* noop */ }
+  }, []);
+
+  const PRICING = [
+    {
+      name: "Free",
+      price: "$0",
+      cadence: "forever",
+      yearlyPrice: null,
+      desc: "A taste — intentionally incomplete. Just enough to feel the difference.",
+      features: ["3 interventions per day", "Basic 60-second lock", "One recovery prompt"],
+      highlighted: false,
+      cta: "Get early access" as string | null,
+      bulletColor: "#564E46",
+    },
+    {
+      name: "Plus",
+      price: billingYearly ? "$47.99" : "$5.99",
+      cadence: billingYearly ? "/yr" : "/mo",
+      yearlyPrice: "$47.99/yr",
+      desc: "The full StillOff system. Everything you need to break the cycle for good.",
+      features: [
+        "Unlimited interventions",
+        "Extended lock durations",
+        "Therapist-curated prompts",
+        "Full recovery modes",
+        "Detailed usage insights",
+      ],
+      highlighted: true,
+      cta: "Get early access" as string | null,
+      bulletColor: "#C4956A",
+    },
+    {
+      name: "Premium",
+      price: billingYearly ? "$79.99" : "$9.99",
+      cadence: billingYearly ? "/yr" : "/mo",
+      yearlyPrice: "$79.99/yr",
+      desc: "For when the spiral is strongest.",
+      features: [
+        "Everything in Plus",
+        "Letter to My Future Self",
+        "Private community access",
+        "Advanced recovery modes",
+        "Therapist prompt library",
+      ],
+      highlighted: false,
+      cta: "Get early access" as string | null,
+      bulletColor: "#A09480",
+    },
+  ];
+
+  const FAQ_ITEMS = [
+    {
+      q: "Is StillOff a blocker app?",
+      a: "No. Blockers prevent access — they rely on your future self to bypass them. StillOff intervenes in real time, at the moment the spiral starts. It's not about restriction. It's about interruption.",
+    },
+    {
+      q: "How does the 60-second lock actually work?",
+      a: "When you trigger a lock, StillOff takes over your screen with a guided breathing session. The distracting apps pause. When the 60 seconds end, you emerge with a prompt — not a guilt trip.",
+    },
+    {
+      q: "What is the Soft Landing?",
+      a: "After a lock ends, StillOff holds a 15-minute buffer before apps are fully accessible again. You're not dropped back into the same loop — there's space to make a different choice.",
+    },
+    {
+      q: "Is my data private?",
+      a: "Yes. Sessions are private by default and never sold. The only data StillOff uses is to improve your experience — pattern learning stays on your device.",
+    },
+    {
+      q: "When does StillOff launch?",
+      a: "We're in early access. Join the waitlist and you'll be first to know. No newsletters — just one email when it's ready.",
+    },
+    {
+      q: "Does it work on Android?",
+      a: "Currently iOS only. Pattern intelligence uses the Screen Time API for deep behavioral analysis. Android is in development.",
+    },
+  ];
 
   return (
     <main className="bg-[#13110E] text-[#F4EFE8] min-h-screen overflow-x-hidden">
@@ -112,18 +519,12 @@ export default function Home() {
           <span className="font-serif text-xl tracking-tight">StillOff</span>
 
           <div className="hidden md:flex gap-8 text-sm" style={{ color: "#A09480" }}>
-            <a href="#how" className="hover:text-[#F4EFE8] transition-colors duration-200">
-              How it works
-            </a>
-            <a href="#pricing" className="hover:text-[#F4EFE8] transition-colors duration-200">
-              Pricing
-            </a>
+            <a href="#how" className="hover:text-[#F4EFE8] transition-colors duration-200">How it works</a>
+            <a href="#pricing" className="hover:text-[#F4EFE8] transition-colors duration-200">Pricing</a>
           </div>
 
           <button
-            onClick={() =>
-              document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })
-            }
+            onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
             className="cta-glow text-sm font-medium px-4 py-2 rounded-xl"
             style={{ background: "#F4EFE8", color: "#0E0D0B" }}
           >
@@ -134,12 +535,10 @@ export default function Home() {
 
       {/* ══ HERO ═════════════════════════════════════════════════════════════ */}
       <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-16 overflow-hidden">
-        {/* warm radial atmosphere */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background:
-              "radial-gradient(ellipse 65% 55% at 50% 48%, rgba(110,70,55,0.28) 0%, rgba(196,149,106,0.09) 45%, transparent 72%)",
+            background: "radial-gradient(ellipse 65% 55% at 50% 48%, rgba(110,70,55,0.28) 0%, rgba(196,149,106,0.09) 45%, transparent 72%)",
           }}
         />
 
@@ -149,44 +548,36 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
         >
-          {/* Orb */}
           <div className="mb-10">
             <StillOrb size={200} />
           </div>
 
-          <p
-            className="text-xs tracking-[0.22em] uppercase mb-6"
-            style={{ color: "#A09480" }}
-          >
-            Real-time intervention
+          <p className="text-xs tracking-[0.22em] uppercase mb-6" style={{ color: "#A09480" }}>
+            You picked up your phone 84 times today.
           </p>
 
           <h1 className="font-serif text-5xl md:text-7xl font-light leading-[1.06] mb-7 max-w-3xl">
-            When you can't stop,
-            <br />
-            <span style={{ color: "#C4956A" }}>StillOff</span> does.
+            {demoCompleted ? (
+              <>Welcome back.<br /><span style={{ color: "#C4956A" }}>Ready to lock it in?</span></>
+            ) : (
+              <>When you can&apos;t stop,<br /><span style={{ color: "#C4956A" }}>StillOff</span> does.</>
+            )}
           </h1>
 
-          <p
-            className="text-lg md:text-xl max-w-xl mx-auto mb-10 leading-relaxed"
-            style={{ color: "#A09480" }}
-          >
+          <p className="text-lg md:text-xl max-w-xl mx-auto mb-10 leading-relaxed" style={{ color: "#A09480" }}>
             A 60-second lock that interrupts the spiral before it takes you under.
           </p>
 
-          {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-16">
             <button
-              onClick={startDemo}
+              onClick={openDemo}
               className="cta-glow font-medium px-7 py-4 rounded-2xl text-base w-full sm:w-auto"
               style={{ background: "#F4EFE8", color: "#0E0D0B" }}
             >
               Try the 60-second lock
             </button>
             <button
-              onClick={() =>
-                document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })
-              }
+              onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
               className="cta-glow font-medium px-7 py-4 rounded-2xl text-base w-full sm:w-auto border"
               style={{ borderColor: "rgba(244,239,232,0.18)", color: "#F4EFE8" }}
             >
@@ -194,27 +585,18 @@ export default function Home() {
             </button>
           </div>
 
-          {/* stats row */}
-          <div
-            className="flex flex-col sm:flex-row gap-6 sm:gap-12 items-center justify-center"
-            style={{ color: "#6A6058" }}
-          >
+          <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 items-center justify-center" style={{ color: "#6A6058" }}>
             {[
-              { value: "60s", label: "Reset lock" },
-              { value: "Real-time", label: "Intervention" },
-              { value: "iOS + Android", label: "Coming soon" },
+              { value: "186×", label: "avg. daily pickups" },
+              { value: "4.3h", label: "avg. screen time" },
+              { value: "60s", label: "reset duration" },
             ].map((s, i) => (
               <div key={i} className="flex items-center gap-6 sm:gap-12">
                 {i > 0 && (
-                  <div
-                    className="hidden sm:block w-px h-7"
-                    style={{ background: "rgba(244,239,232,0.07)" }}
-                  />
+                  <div className="hidden sm:block w-px h-7" style={{ background: "rgba(244,239,232,0.07)" }} />
                 )}
                 <div className="text-center">
-                  <div className="text-2xl font-light" style={{ color: "#B4A898" }}>
-                    {s.value}
-                  </div>
+                  <div className="text-2xl font-light" style={{ color: "#B4A898" }}>{s.value}</div>
                   <div className="text-xs tracking-wider uppercase mt-1">{s.label}</div>
                 </div>
               </div>
@@ -222,7 +604,6 @@ export default function Home() {
           </div>
         </motion.div>
 
-        {/* scroll cue */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
           <div className="scroll-cue" />
         </div>
@@ -231,39 +612,66 @@ export default function Home() {
       {/* ══ THE SPIRAL ═══════════════════════════════════════════════════════ */}
       <section className="px-6 py-28 max-w-5xl mx-auto">
         <FadeUp>
-          <p
-            className="text-xs tracking-[0.22em] uppercase text-center mb-5"
-            style={{ color: "#A09480" }}
-          >
-            You already know
+          <p className="font-serif text-3xl md:text-4xl font-light leading-snug max-w-2xl mb-6" style={{ color: "#F4EFE8" }}>
+            You didn&apos;t decide to spiral. It was already happening — the moment you picked it up.
           </p>
-          <h2 className="font-serif text-4xl md:text-5xl font-light text-center mb-16 leading-tight">
-            The spiral has a feel.
-          </h2>
+          <p className="max-w-xl text-base leading-7 mb-16" style={{ color: "#A09480" }}>
+            StillOff steps in at that exact moment. Before the loop closes. Before the next ten minutes disappear.
+          </p>
         </FadeUp>
 
         <div className="grid md:grid-cols-3 gap-4">
           {[
             "One notification. Then forty-five minutes gone.",
-            "You said five minutes. You meant it. It's been an hour.",
+            "You said five minutes. You meant it. It\u2019s been an hour.",
             "You know you should stop. Your thumb keeps scrolling.",
           ].map((text, i) => (
             <FadeUp key={i} delay={i * 0.1}>
               <div
                 className="rounded-2xl p-8 h-full"
-                style={{
-                  background: "#141210",
-                  border: "1px solid rgba(244,239,232,0.06)",
-                }}
+                style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.06)" }}
               >
-                <div className="mb-5 text-xl" style={{ color: "#3A2E28" }}>
-                  ◎
-                </div>
-                <p
-                  className="text-lg font-light leading-relaxed"
-                  style={{ color: "#B4A898" }}
-                >
+                <div className="mb-5 text-xl" style={{ color: "#3A2E28" }}>◎</div>
+                <p className="text-lg font-light leading-relaxed" style={{ color: "#B4A898" }}>
                   {text}
+                </p>
+              </div>
+            </FadeUp>
+          ))}
+        </div>
+      </section>
+
+      {/* ══ THE MOMENT ═══════════════════════════════════════════════════════ */}
+      <section className="px-6 py-20 max-w-5xl mx-auto">
+        <FadeUp>
+          <p className="text-xs tracking-[0.22em] uppercase text-center mb-5" style={{ color: "#A09480" }}>
+            The moment before
+          </p>
+          <h2 className="font-serif text-4xl md:text-5xl font-light text-center mb-5 leading-tight">
+            There&apos;s always a second right before it happens.
+          </h2>
+          <p className="text-center max-w-md mx-auto mb-14 text-base" style={{ color: "#A09480" }}>
+            StillOff is built for that exact second.
+          </p>
+        </FadeUp>
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          {[
+            ["Reflex", "I just opened it again. I didn\u2019t even think about it."],
+            ["Focus loss", "I was trying to work. Now I\u2019m 15 minutes deep."],
+            ["Awareness", "I know this is making it worse\u2026 and I\u2019m still here."],
+            ["Time distortion", "It\u2019s been an hour. I don\u2019t even remember why I picked it up."],
+          ].map(([title, body], i) => (
+            <FadeUp key={title} delay={i * 0.07}>
+              <div
+                className="rounded-2xl p-7 h-full"
+                style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.06)" }}
+              >
+                <p className="text-xs tracking-[0.22em] uppercase mb-4" style={{ color: "#564E46" }}>
+                  {title}
+                </p>
+                <p className="font-serif text-2xl font-light leading-snug" style={{ color: "#F4EFE8" }}>
+                  &ldquo;{body}&rdquo;
                 </p>
               </div>
             </FadeUp>
@@ -274,19 +682,13 @@ export default function Home() {
       {/* ══ HOW IT WORKS ═════════════════════════════════════════════════════ */}
       <section id="how" className="px-6 py-28 max-w-5xl mx-auto">
         <FadeUp>
-          <p
-            className="text-xs tracking-[0.22em] uppercase text-center mb-5"
-            style={{ color: "#A09480" }}
-          >
+          <p className="text-xs tracking-[0.22em] uppercase text-center mb-5" style={{ color: "#A09480" }}>
             The system
           </p>
           <h2 className="font-serif text-4xl md:text-5xl font-light text-center mb-5 leading-tight">
             How it works
           </h2>
-          <p
-            className="text-center max-w-md mx-auto mb-16 text-base"
-            style={{ color: "#A09480" }}
-          >
+          <p className="text-center max-w-md mx-auto mb-16 text-base" style={{ color: "#A09480" }}>
             Three moments. One reset.
           </p>
         </FadeUp>
@@ -312,22 +714,13 @@ export default function Home() {
             <FadeUp key={i} delay={i * 0.12}>
               <div
                 className="rounded-2xl p-8 h-full flex flex-col"
-                style={{
-                  background: "#141210",
-                  border: "1px solid rgba(244,239,232,0.06)",
-                }}
+                style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.06)" }}
               >
-                <div
-                  className="text-xs tracking-[0.18em] mb-6"
-                  style={{ color: "#564E46" }}
-                >
+                <div className="text-xs tracking-[0.18em] mb-6" style={{ color: "#564E46" }}>
                   {item.step}
                 </div>
                 <h3 className="font-serif text-2xl font-light mb-4">{item.title}</h3>
-                <p
-                  className="text-sm leading-relaxed flex-1"
-                  style={{ color: "#A09480" }}
-                >
+                <p className="text-sm leading-relaxed flex-1" style={{ color: "#A09480" }}>
                   {item.desc}
                 </p>
               </div>
@@ -341,30 +734,22 @@ export default function Home() {
         <FadeUp>
           <div
             className="max-w-xl mx-auto rounded-3xl p-12 relative overflow-hidden"
-            style={{
-              background: "#141210",
-              border: "1px solid rgba(244,239,232,0.07)",
-            }}
+            style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.07)" }}
           >
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
-                background:
-                  "radial-gradient(ellipse 80% 60% at 50% 105%, rgba(110,70,55,0.22) 0%, transparent 65%)",
+                background: "radial-gradient(ellipse 80% 60% at 50% 105%, rgba(110,70,55,0.22) 0%, transparent 65%)",
               }}
             />
             <div className="relative flex flex-col items-center">
-              <div className="mb-8">
-                <StillOrb size={88} />
-              </div>
-              <h2 className="font-serif text-3xl md:text-4xl font-light mb-4">
-                Feel it for yourself.
-              </h2>
+              <div className="mb-8"><StillOrb size={88} /></div>
+              <h2 className="font-serif text-3xl md:text-4xl font-light mb-4">Feel it for yourself.</h2>
               <p className="mb-8 text-sm" style={{ color: "#A09480" }}>
                 This is what 60 seconds of control feels like.
               </p>
               <button
-                onClick={startDemo}
+                onClick={openDemo}
                 className="cta-glow font-medium px-8 py-4 rounded-2xl text-base"
                 style={{ background: "#F4EFE8", color: "#0E0D0B" }}
               >
@@ -378,11 +763,8 @@ export default function Home() {
       {/* ══ FEATURES ═════════════════════════════════════════════════════════ */}
       <section className="px-6 py-28 max-w-5xl mx-auto">
         <FadeUp>
-          <p
-            className="text-xs tracking-[0.22em] uppercase text-center mb-5"
-            style={{ color: "#A09480" }}
-          >
-            What's inside
+          <p className="text-xs tracking-[0.22em] uppercase text-center mb-5" style={{ color: "#A09480" }}>
+            What&apos;s inside
           </p>
           <h2 className="font-serif text-4xl md:text-5xl font-light text-center mb-16">
             Built for the spiral.
@@ -425,18 +807,229 @@ export default function Home() {
             <FadeUp key={i} delay={(i % 3) * 0.07}>
               <div
                 className="rounded-2xl p-6 h-full"
+                style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.06)" }}
+              >
+                <div className="text-xl mb-4" style={{ color: "#C4956A" }}>{f.symbol}</div>
+                <h3 className="text-sm font-medium mb-2">{f.label}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "#A09480" }}>{f.desc}</p>
+              </div>
+            </FadeUp>
+          ))}
+        </div>
+      </section>
+
+      {/* ══ SOFT LANDING ═════════════════════════════════════════════════════ */}
+      <section className="px-6 py-20 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-10 items-center">
+          <FadeUp>
+            <p className="text-xs tracking-[0.22em] uppercase mb-5" style={{ color: "#A09480" }}>
+              Soft Landing
+            </p>
+            <h2 className="font-serif text-4xl font-light leading-snug mb-6">
+              Most blockers end.<br />StillOff eases you back.
+            </h2>
+            <p className="text-base leading-7 mb-4" style={{ color: "#A09480" }}>
+              After the lock lifts, you don&apos;t get dropped straight back into the same loop you just escaped.
+            </p>
+            <p className="text-base leading-7" style={{ color: "#A09480" }}>
+              There&apos;s a 15-minute window. Enough distance to make a different decision.
+            </p>
+          </FadeUp>
+          <FadeUp delay={0.12}>
+            <SoftLandingCard />
+          </FadeUp>
+        </div>
+      </section>
+
+      {/* ══ WHY DIFFERENT ════════════════════════════════════════════════════ */}
+      <section className="px-6 py-20 max-w-5xl mx-auto">
+        <FadeUp>
+          <h2 className="font-serif text-4xl md:text-5xl font-light text-center mb-14 leading-tight max-w-2xl mx-auto">
+            Everything else tells you to stop.<br />StillOff is built to stop you.
+          </h2>
+        </FadeUp>
+
+        <FadeUp delay={0.08}>
+          <div
+            className="overflow-hidden rounded-2xl"
+            style={{ border: "1px solid rgba(244,239,232,0.08)" }}
+          >
+            <div
+              className="grid grid-cols-2"
+              style={{ background: "#1A1612", borderBottom: "1px solid rgba(244,239,232,0.08)" }}
+            >
+              <div className="px-7 py-4 text-xs tracking-[0.22em] uppercase" style={{ color: "#564E46" }}>
+                Other apps
+              </div>
+              <div
+                className="px-7 py-4 text-xs tracking-[0.22em] uppercase"
+                style={{ color: "#A09480", borderLeft: "1px solid rgba(244,239,232,0.08)" }}
+              >
+                StillOff
+              </div>
+            </div>
+            {[
+              ["Track your usage", "Stop the behavior"],
+              ["Suggest breaks", "Intervene in the moment"],
+              ["Rely on your discipline", "Remove the decision"],
+              ["Easy to bypass", "Designed to hold"],
+              ["Work when you're motivated", "Work when you're not"],
+            ].map(([left, right], i) => (
+              <div
+                key={i}
+                className="grid grid-cols-2"
                 style={{
-                  background: "#141210",
-                  border: "1px solid rgba(244,239,232,0.06)",
+                  background: i % 2 === 0 ? "#141210" : "#161410",
+                  borderBottom: i < 4 ? "1px solid rgba(244,239,232,0.05)" : undefined,
                 }}
               >
-                <div className="text-xl mb-4" style={{ color: "#C4956A" }}>
-                  {f.symbol}
+                <div className="px-7 py-5 text-sm" style={{ color: "#6A6058" }}>{left}</div>
+                <div
+                  className="px-7 py-5 text-sm"
+                  style={{ color: "#F4EFE8", borderLeft: "1px solid rgba(244,239,232,0.06)" }}
+                >
+                  {right}
                 </div>
-                <h3 className="text-sm font-medium mb-2">{f.label}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "#A09480" }}>
-                  {f.desc}
+              </div>
+            ))}
+          </div>
+        </FadeUp>
+      </section>
+
+      {/* ══ BIG QUOTE ════════════════════════════════════════════════════════ */}
+      <section className="px-6 py-20 max-w-4xl mx-auto text-center">
+        <FadeUp>
+          <p className="font-serif text-3xl md:text-4xl font-light leading-snug" style={{ color: "#F4EFE8" }}>
+            You don&apos;t need more guilt about your habits.
+          </p>
+          <p className="mt-5 text-lg leading-8" style={{ color: "#A09480" }}>
+            You need a way to break them while they&apos;re happening.
+          </p>
+        </FadeUp>
+      </section>
+
+      {/* ══ PROOF ════════════════════════════════════════════════════════════ */}
+      <section className="px-6 py-20 max-w-5xl mx-auto">
+        <FadeUp>
+          <p className="text-xs tracking-[0.22em] uppercase text-center mb-5" style={{ color: "#A09480" }}>
+            Early access
+          </p>
+          <h2 className="font-serif text-4xl md:text-5xl font-light text-center mb-14 leading-tight">
+            Real language. No startup polish.
+          </h2>
+        </FadeUp>
+
+        <div className="grid lg:grid-cols-[1fr_1.4fr] gap-4">
+          <div className="grid gap-4">
+            {[
+              ["It stopped me before I spiraled.", "Maya, New York"],
+              ["This is the first thing that actually interrupted me.", "James, Chicago"],
+              ["I didn\u2019t realize how automatic it had become.", "Sofia, London"],
+            ].map(([quote, person], i) => (
+              <FadeUp key={i} delay={i * 0.07}>
+                <div
+                  className="rounded-2xl p-6 h-full"
+                  style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.06)" }}
+                >
+                  <p className="font-serif text-xl font-light leading-snug mb-4" style={{ color: "#F4EFE8" }}>
+                    &ldquo;{quote}&rdquo;
+                  </p>
+                  <p className="text-xs" style={{ color: "#564E46" }}>{person}</p>
+                </div>
+              </FadeUp>
+            ))}
+          </div>
+
+          <FadeUp delay={0.1}>
+            <div
+              className="h-full rounded-2xl p-8 flex flex-col justify-between"
+              style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.06)" }}
+            >
+              <div>
+                <p className="text-xs tracking-[0.22em] uppercase mb-3" style={{ color: "#A09480" }}>
+                  Session complete
                 </p>
+                <p className="font-serif text-5xl font-light mb-6" style={{ color: "#C4956A" }}>18 min</p>
+                <p className="font-serif text-2xl font-light leading-snug mb-4" style={{ color: "#F4EFE8" }}>
+                  I sat with it. I didn&apos;t look away.
+                </p>
+                <p className="text-base leading-7" style={{ color: "#A09480" }}>
+                  &ldquo;It didn&apos;t pass. You moved through it. The world waited. It was fine.&rdquo;
+                </p>
+              </div>
+              <div
+                className="mt-8 pt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+                style={{ borderTop: "1px solid rgba(244,239,232,0.06)" }}
+              >
+                <p className="text-xs" style={{ color: "#564E46" }}>
+                  Private by default · Shareable when ready
+                </p>
+                <button
+                  onClick={handleShare}
+                  className="rounded-xl px-5 py-2.5 text-xs font-medium transition-colors hover:text-[#F4EFE8]"
+                  style={{
+                    border: "1px solid rgba(244,239,232,0.10)",
+                    color: "#A09480",
+                  }}
+                >
+                  Share this moment
+                </button>
+              </div>
+            </div>
+          </FadeUp>
+        </div>
+      </section>
+
+      {/* ══ FAQ ══════════════════════════════════════════════════════════════ */}
+      <section className="px-6 py-20 max-w-3xl mx-auto">
+        <FadeUp>
+          <p className="text-xs tracking-[0.22em] uppercase text-center mb-5" style={{ color: "#A09480" }}>
+            Questions
+          </p>
+          <h2 className="font-serif text-4xl font-light text-center mb-12">Common questions</h2>
+        </FadeUp>
+
+        <div className="space-y-2">
+          {FAQ_ITEMS.map((item, i) => (
+            <FadeUp key={i} delay={i * 0.04}>
+              <div
+                className="rounded-2xl overflow-hidden"
+                style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.06)" }}
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full flex items-center justify-between px-6 py-5 text-left text-sm font-medium transition-colors hover:text-[#C4956A]"
+                >
+                  <span>{item.q}</span>
+                  <span
+                    className="ml-4 flex-shrink-0 text-lg transition-transform duration-300"
+                    style={{
+                      color: "#564E46",
+                      transform: openFaq === i ? "rotate(45deg)" : "rotate(0deg)",
+                    }}
+                  >
+                    +
+                  </span>
+                </button>
+                <AnimatePresence initial={false}>
+                  {openFaq === i && (
+                    <motion.div
+                      key="answer"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <p
+                        className="px-6 pb-5 text-sm leading-7"
+                        style={{ color: "#A09480", borderTop: "1px solid rgba(244,239,232,0.05)" }}
+                      >
+                        {item.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </FadeUp>
           ))}
@@ -446,328 +1039,247 @@ export default function Home() {
       {/* ══ PRICING ══════════════════════════════════════════════════════════ */}
       <section id="pricing" className="px-6 py-28 max-w-5xl mx-auto">
         <FadeUp>
-          <p
-            className="text-xs tracking-[0.22em] uppercase text-center mb-5"
-            style={{ color: "#A09480" }}
-          >
+          <p className="text-xs tracking-[0.22em] uppercase text-center mb-5" style={{ color: "#A09480" }}>
             Pricing
           </p>
-          <h2 className="font-serif text-4xl md:text-5xl font-light text-center mb-5">
-            Simple. Honest.
-          </h2>
-          <p className="text-center mb-16 text-base" style={{ color: "#A09480" }}>
+          <h2 className="font-serif text-4xl md:text-5xl font-light text-center mb-5">Simple. Honest.</h2>
+          <p className="text-center mb-10 text-base" style={{ color: "#A09480" }}>
             Start free. Upgrade when you feel the difference.
           </p>
+
+          {/* billing toggle */}
+          <div className="flex items-center justify-center gap-1 mb-14">
+            <button
+              onClick={() => setBillingYearly(false)}
+              className="px-4 py-1.5 rounded-lg text-sm transition-colors"
+              style={{
+                background: !billingYearly ? "rgba(244,239,232,0.10)" : "transparent",
+                color: !billingYearly ? "#F4EFE8" : "#6A6058",
+              }}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBillingYearly(true)}
+              className="px-4 py-1.5 rounded-lg text-sm flex items-center gap-2 transition-colors"
+              style={{
+                background: billingYearly ? "rgba(244,239,232,0.10)" : "transparent",
+                color: billingYearly ? "#F4EFE8" : "#6A6058",
+              }}
+            >
+              Yearly
+              <span
+                className="text-xs px-1.5 py-0.5 rounded-full"
+                style={{ background: "rgba(196,149,106,0.16)", color: "#C4956A" }}
+              >
+                −33%
+              </span>
+            </button>
+          </div>
         </FadeUp>
 
         <div className="grid md:grid-cols-3 gap-4 items-stretch">
+          {PRICING.map((tier, idx) => (
+            <FadeUp key={tier.name} delay={idx * 0.1}>
+              <div
+                className="rounded-2xl p-7 flex flex-col h-full relative overflow-hidden"
+                style={{
+                  background: tier.highlighted ? "#252018" : "#1E1A16",
+                  border: tier.highlighted
+                    ? "1px solid rgba(196,149,106,0.38)"
+                    : "1px solid rgba(244,239,232,0.09)",
+                }}
+              >
+                {tier.highlighted && (
+                  <div
+                    className="absolute top-0 inset-x-0 h-px"
+                    style={{
+                      background: "linear-gradient(90deg, transparent, rgba(196,149,106,0.6), transparent)",
+                    }}
+                  />
+                )}
 
-          {/* FREE */}
-          <FadeUp delay={0}>
-            <div
-              className="rounded-2xl p-7 flex flex-col h-full"
-              style={{ background: "#1E1A16", border: "1px solid rgba(244,239,232,0.09)" }}
-            >
-              <p className="text-xs tracking-widest uppercase mb-5" style={{ color: "#6A6058" }}>
-                Free
-              </p>
-              <div className="text-3xl font-light mb-1">$0</div>
-              <p className="text-sm mb-7 leading-relaxed flex-1" style={{ color: "#A09480" }}>
-                A taste — intentionally incomplete. Just enough to feel the difference.
-              </p>
-              <ul className="space-y-3 mb-8 text-sm" style={{ color: "#A09480" }}>
-                {["3 interventions per day", "Basic 60-second lock", "One recovery prompt"].map(
-                  (f) => (
+                <div className="flex items-center justify-between mb-5">
+                  <p
+                    className="text-xs tracking-widest uppercase"
+                    style={{ color: tier.highlighted ? "#C4956A" : "#6A6058" }}
+                  >
+                    {tier.name}
+                  </p>
+                  {tier.highlighted && (
+                    <span
+                      className="text-xs px-2 py-1 rounded-full"
+                      style={{ background: "rgba(196,149,106,0.12)", color: "#C4956A" }}
+                    >
+                      Most popular
+                    </span>
+                  )}
+                </div>
+
+                <div className="text-3xl font-light mb-1">
+                  {tier.price}
+                  <span className="text-base font-normal ml-1" style={{ color: "#6A6058" }}>
+                    {tier.cadence}
+                  </span>
+                </div>
+                {billingYearly && tier.yearlyPrice && (
+                  <p className="text-xs mb-1" style={{ color: "#564E46" }}>
+                    Billed annually
+                  </p>
+                )}
+
+                <p
+                  className="text-sm mb-7 leading-relaxed flex-1 mt-3"
+                  style={{ color: tier.highlighted ? "#B4A898" : "#A09480" }}
+                >
+                  {tier.desc}
+                </p>
+
+                <ul className="space-y-3 mb-8 text-sm" style={{ color: tier.highlighted ? "#B4A898" : "#A09480" }}>
+                  {tier.features.map((f) => (
                     <li key={f} className="flex items-start gap-3">
-                      <span style={{ color: "#564E46", marginTop: 2 }}>–</span>
+                      <span style={{ color: tier.bulletColor, marginTop: 2 }}>
+                        {tier.highlighted ? "✓" : tier.name === "Free" ? "–" : "✓"}
+                      </span>
                       {f}
                     </li>
-                  )
+                  ))}
+                </ul>
+
+                {tier.cta && (
+                  <button
+                    onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
+                    className="cta-glow w-full py-3 rounded-xl text-sm font-medium"
+                    style={
+                      tier.highlighted
+                        ? { background: "#F4EFE8", color: "#0E0D0B" }
+                        : { border: "1px solid rgba(244,239,232,0.14)", color: "#F4EFE8" }
+                    }
+                  >
+                    {tier.cta}
+                  </button>
                 )}
-              </ul>
-              <button
-                className="cta-glow w-full py-3 rounded-xl text-sm font-medium border"
-                style={{ borderColor: "rgba(244,239,232,0.14)", color: "#F4EFE8" }}
-              >
-                Get early access
-              </button>
-            </div>
-          </FadeUp>
-
-          {/* PLUS — highlighted */}
-          <FadeUp delay={0.1}>
-            <div
-              className="rounded-2xl p-7 flex flex-col h-full relative overflow-hidden"
-              style={{
-                background: "#252018",
-                border: "1px solid rgba(196,149,106,0.38)",
-              }}
-            >
-              {/* top accent line */}
-              <div
-                className="absolute top-0 inset-x-0 h-px"
-                style={{
-                  background:
-                    "linear-gradient(90deg, transparent, rgba(196,149,106,0.6), transparent)",
-                }}
-              />
-              <div className="flex items-center justify-between mb-5">
-                <p className="text-xs tracking-widest uppercase" style={{ color: "#C4956A" }}>
-                  Plus
-                </p>
-                <span
-                  className="text-xs px-2 py-1 rounded-full"
-                  style={{ background: "rgba(196,149,106,0.12)", color: "#C4956A" }}
-                >
-                  Most popular
-                </span>
               </div>
-              <div className="text-3xl font-light mb-1">
-                $5.99
-                <span className="text-base font-normal ml-1" style={{ color: "#6A6058" }}>
-                  /mo
-                </span>
-              </div>
-              <p className="text-sm mb-7 leading-relaxed flex-1" style={{ color: "#B4A898" }}>
-                The full StillOff system. Everything you need to break the cycle for good.
-              </p>
-              <ul className="space-y-3 mb-8 text-sm" style={{ color: "#B4A898" }}>
-                {[
-                  "Unlimited interventions",
-                  "Extended lock durations",
-                  "Therapist-curated prompts",
-                  "Full recovery modes",
-                  "Detailed usage insights",
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-3">
-                    <span style={{ color: "#C4956A", marginTop: 2 }}>✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                className="cta-glow w-full py-3 rounded-xl text-sm font-medium"
-                style={{ background: "#F4EFE8", color: "#0E0D0B" }}
-              >
-                Get early access
-              </button>
-            </div>
-          </FadeUp>
-
-          {/* PREMIUM */}
-          <FadeUp delay={0.2}>
-            <div
-              className="rounded-2xl p-7 flex flex-col h-full"
-              style={{ background: "#1E1A16", border: "1px solid rgba(244,239,232,0.09)" }}
-            >
-              <p className="text-xs tracking-widest uppercase mb-5" style={{ color: "#6A6058" }}>
-                Premium
-              </p>
-              <div className="text-3xl font-light mb-1">
-                $9.99
-                <span className="text-base font-normal ml-1" style={{ color: "#6A6058" }}>
-                  /mo
-                </span>
-              </div>
-              <p className="text-sm mb-7 leading-relaxed flex-1" style={{ color: "#A09480" }}>
-                For when the spiral is strongest.
-              </p>
-              <ul className="space-y-3 mb-8 text-sm" style={{ color: "#A09480" }}>
-                {[
-                  "Everything in Plus",
-                  "Letter to My Future Self",
-                  "Private community access",
-                  "Advanced recovery modes",
-                  "Therapist prompt library",
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-3">
-                    <span style={{ color: "#564E46", marginTop: 2 }}>–</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                className="cta-glow w-full py-3 rounded-xl text-sm font-medium border"
-                style={{ borderColor: "rgba(244,239,232,0.14)", color: "#F4EFE8" }}
-              >
-                Get early access
-              </button>
-            </div>
-          </FadeUp>
-
+            </FadeUp>
+          ))}
         </div>
       </section>
 
-      {/* ══ FINAL CTA ════════════════════════════════════════════════════════ */}
+      {/* ══ WAITLIST ═════════════════════════════════════════════════════════ */}
       <section
+        ref={waitlistRef as React.RefObject<HTMLElement>}
         id="waitlist"
         className="relative px-6 py-32 text-center overflow-hidden"
       >
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background:
-              "radial-gradient(ellipse 55% 65% at 50% 50%, rgba(110,70,55,0.18) 0%, transparent 70%)",
+            background: "radial-gradient(ellipse 55% 65% at 50% 50%, rgba(110,70,55,0.18) 0%, transparent 70%)",
           }}
         />
         <FadeUp>
-          <div className="relative max-w-2xl mx-auto">
-            <p
-              className="text-xs tracking-[0.22em] uppercase mb-6"
-              style={{ color: "#A09480" }}
-            >
+          <div className="relative max-w-xl mx-auto">
+            <div className="flex items-center justify-center gap-2 mb-6">
+              <span
+                className="w-2 h-2 rounded-full animate-pulse"
+                style={{ background: "#C4956A" }}
+              />
+              <p className="text-sm" style={{ color: "#A09480" }}>
+                <CountUp from={2727} to={2847} /> people on the waitlist
+              </p>
+            </div>
+
+            <p className="text-xs tracking-[0.22em] uppercase mb-6" style={{ color: "#A09480" }}>
               Early access
             </p>
             <h2 className="font-serif text-5xl md:text-6xl font-light mb-6 leading-tight">
-              Take back
-              <br />
-              control.
+              Take back<br />control.
             </h2>
             <p className="text-lg mb-10" style={{ color: "#A09480" }}>
               Join the waitlist. Be first when StillOff launches.
             </p>
-            <button
-              className="cta-glow font-medium px-10 py-4 rounded-2xl text-base"
-              style={{ background: "#F4EFE8", color: "#0E0D0B" }}
-            >
-              Get early access
-            </button>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row max-w-md mx-auto mb-4">
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="Email address"
+                className="flex-1 min-w-0 rounded-2xl px-5 py-3.5 text-sm outline-none"
+                style={{
+                  background: "#1E1A16",
+                  border: "1px solid rgba(244,239,232,0.10)",
+                  color: "#F4EFE8",
+                }}
+              />
+              <button
+                type="submit"
+                className="cta-glow rounded-2xl px-6 py-3.5 text-sm font-medium"
+                style={{ background: "#F4EFE8", color: "#0E0D0B" }}
+              >
+                Get early access
+              </button>
+            </form>
+            <p className="text-xs" style={{ color: "#564E46" }}>
+              No newsletters. One email when it&apos;s ready.
+            </p>
           </div>
         </FadeUp>
       </section>
 
       {/* ══ FOOTER ═══════════════════════════════════════════════════════════ */}
-      <footer
-        className="px-6 py-10"
-        style={{ borderTop: "1px solid rgba(244,239,232,0.09)" }}
-      >
+      <footer className="px-6 py-10" style={{ borderTop: "1px solid rgba(244,239,232,0.09)" }}>
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="font-serif text-lg" style={{ color: "#6A6058" }}>
-            StillOff
-          </span>
+          <span className="font-serif text-lg" style={{ color: "#6A6058" }}>StillOff</span>
           <div className="flex gap-6 text-xs" style={{ color: "#6A6058" }}>
-            <a href="/privacy" className="hover:text-[#F4EFE8] transition-colors">
-              Privacy
-            </a>
-            <a href="/terms" className="hover:text-[#F4EFE8] transition-colors">
-              Terms
-            </a>
+            <a href="/privacy" className="hover:text-[#F4EFE8] transition-colors">Privacy</a>
+            <a href="/terms" className="hover:text-[#F4EFE8] transition-colors">Terms</a>
+            <a href="mailto:hello@stilloff.com" className="hover:text-[#F4EFE8] transition-colors">Contact</a>
           </div>
-          <p className="text-xs" style={{ color: "#564E46" }}>
-            © 2025 StillOff
-          </p>
+          <p className="text-xs" style={{ color: "#564E46" }}>© 2025 StillOff</p>
         </div>
       </footer>
 
-      {/* ══ DEMO MODAL ═══════════════════════════════════════════════════════ */}
+      {/* ══ STICKY CTA ═══════════════════════════════════════════════════════ */}
       <AnimatePresence>
-        {demoOpen && (
-          <motion.div
-            key="backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.28 }}
-            className="fixed inset-0 z-50 flex items-center justify-center px-6"
-            style={{ background: "rgba(0,0,0,0.90)", backdropFilter: "blur(14px)" }}
-            onClick={(e) => {
-              if (e.target === e.currentTarget) closeDemo();
+        {showSticky && (
+          <motion.button
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.25 }}
+            onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
+            className="fixed bottom-5 right-5 z-40 rounded-full px-5 py-2.5 text-xs font-medium border backdrop-blur-md transition-colors hover:text-[#F4EFE8]"
+            style={{
+              background: "rgba(19,17,14,0.90)",
+              border: "1px solid rgba(244,239,232,0.12)",
+              color: "#A09480",
             }}
           >
-            <motion.div
-              key="card"
-              initial={{ opacity: 0, scale: 0.93, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.93, y: 20 }}
-              transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-              className="relative rounded-3xl p-10 max-w-sm w-full text-center overflow-hidden"
-              style={{
-                background: "#1E1A16",
-                border: "1px solid rgba(244,239,232,0.10)",
-              }}
-            >
-              {/* inner glow */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background:
-                    "radial-gradient(ellipse 80% 50% at 50% 110%, rgba(110,70,55,0.28) 0%, transparent 65%)",
-                }}
-              />
+            Join waitlist
+          </motion.button>
+        )}
+      </AnimatePresence>
 
-              {/* close */}
-              <button
-                onClick={closeDemo}
-                className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full transition-colors text-lg"
-                style={{ background: "rgba(244,239,232,0.07)", color: "#A09480" }}
-                aria-label="Close"
-              >
-                ×
-              </button>
+      {/* ══ DEMO MODAL ═══════════════════════════════════════════════════════ */}
+      <DemoModal open={demoOpen} onClose={handleDemoClose} onComplete={handleDemoComplete} onSubmit={handleSubmit} />
 
-              <div className="relative flex flex-col items-center">
-                <div className="mb-8">
-                  <StillOrb size={100} intense={phase === "locking"} />
-                </div>
-
-                <AnimatePresence mode="wait">
-                  {phase === "locking" && (
-                    <motion.div
-                      key="locking"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.4 }}
-                      className="flex flex-col items-center"
-                    >
-                      <p
-                        className="text-xs tracking-[0.18em] uppercase mb-4"
-                        style={{ color: "#A09480" }}
-                      >
-                        Lock active
-                      </p>
-                      <p className="font-serif text-3xl font-light mb-2">Breathe.</p>
-                      <p className="text-sm" style={{ color: "#A09480" }}>
-                        60 seconds. Just this.
-                      </p>
-                    </motion.div>
-                  )}
-
-                  {phase === "done" && (
-                    <motion.div
-                      key="done"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.5 }}
-                      className="flex flex-col items-center"
-                    >
-                      <p
-                        className="text-xs tracking-[0.18em] uppercase mb-4"
-                        style={{ color: "#C4956A" }}
-                      >
-                        Reset complete
-                      </p>
-                      <p className="font-serif text-3xl font-light mb-3">
-                        That felt different.
-                      </p>
-                      <p
-                        className="text-sm mb-8 leading-relaxed"
-                        style={{ color: "#A09480" }}
-                      >
-                        That's what control feels like.
-                      </p>
-                      <button
-                        className="cta-glow font-medium px-7 py-3 rounded-xl text-sm w-full"
-                        style={{ background: "#F4EFE8", color: "#0E0D0B" }}
-                      >
-                        Get early access
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </motion.div>
+      {/* ══ TOAST ════════════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 12 }}
+            transition={{ duration: 0.25 }}
+            className="fixed bottom-16 left-1/2 z-[200] -translate-x-1/2 whitespace-nowrap rounded-2xl px-6 py-3 text-sm shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-md"
+            style={{
+              background: "rgba(26,22,18,0.95)",
+              border: "1px solid rgba(244,239,232,0.10)",
+              color: "#F4EFE8",
+            }}
+          >
+            {toast}
           </motion.div>
         )}
       </AnimatePresence>
