@@ -32,7 +32,11 @@
       "Bash(git add:*)",
       "Bash(git commit -m ':*)",
       "Bash(git push:*)",
-      "Bash(npx vercel:*)"
+      "Bash(npx vercel:*)",
+      "Bash(git commit -m ' *)",
+      "Bash(kill -9 1968 1580 1513)",
+      "Bash(awk '{print $1}')",
+      "Bash(xargs kill *)"
     ]
   }
 }

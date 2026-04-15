@@ -50,7 +50,7 @@ function StillOrb({
           inset: `-${size * 0.35}px`,
           borderRadius: "50%",
           background:
-            "radial-gradient(circle, rgba(110,70,55,0.30) 0%, rgba(196,149,106,0.10) 40%, transparent 72%)",
+            "radial-gradient(circle, rgba(110,70,55,0.42) 0%, rgba(196,149,106,0.16) 40%, transparent 72%)",
           filter: `blur(${size * 0.14}px)`,
           animation: `orb-breathe ${dur} ease-in-out infinite`,
         }}
@@ -62,7 +62,7 @@ function StillOrb({
           inset: 0,
           borderRadius: "50%",
           background:
-            "radial-gradient(circle, rgba(110,70,55,0.60) 0%, rgba(80,46,35,0.48) 45%, rgba(38,22,16,0.22) 70%, transparent 100%)",
+            "radial-gradient(circle, rgba(130,82,62,0.72) 0%, rgba(96,55,40,0.58) 45%, rgba(50,28,18,0.28) 70%, transparent 100%)",
           animation: `orb-breathe ${dur} ease-in-out infinite`,
         }}
       />
@@ -73,7 +73,7 @@ function StillOrb({
           inset: `${size * 0.22}px`,
           borderRadius: "50%",
           background:
-            "radial-gradient(circle, rgba(210,160,110,0.65) 0%, rgba(150,95,68,0.52) 38%, rgba(110,70,55,0.28) 70%, transparent 100%)",
+            "radial-gradient(circle, rgba(225,175,120,0.78) 0%, rgba(170,108,76,0.64) 38%, rgba(120,78,58,0.34) 70%, transparent 100%)",
           animation: `orb-core ${dur} ease-in-out infinite`,
         }}
       />
@@ -97,21 +97,21 @@ export default function Home() {
   }
 
   return (
-    <main className="bg-[#0E0D0B] text-[#F4EFE8] min-h-screen overflow-x-hidden">
+    <main className="bg-[#13110E] text-[#F4EFE8] min-h-screen overflow-x-hidden">
 
       {/* ══ NAV ══════════════════════════════════════════════════════════════ */}
       <nav
         className="fixed top-0 inset-x-0 z-50 h-16 flex items-center"
         style={{
-          background: "rgba(14,13,11,0.82)",
+          background: "rgba(19,17,14,0.85)",
           backdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(244,239,232,0.06)",
+          borderBottom: "1px solid rgba(244,239,232,0.08)",
         }}
       >
         <div className="max-w-6xl mx-auto w-full px-6 flex items-center justify-between">
           <span className="font-serif text-xl tracking-tight">StillOff</span>
 
-          <div className="hidden md:flex gap-8 text-sm" style={{ color: "#7A7068" }}>
+          <div className="hidden md:flex gap-8 text-sm" style={{ color: "#A09480" }}>
             <a href="#how" className="hover:text-[#F4EFE8] transition-colors duration-200">
               How it works
             </a>
@@ -139,7 +139,7 @@ export default function Home() {
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse 65% 55% at 50% 48%, rgba(110,70,55,0.20) 0%, rgba(196,149,106,0.05) 45%, transparent 72%)",
+              "radial-gradient(ellipse 65% 55% at 50% 48%, rgba(110,70,55,0.28) 0%, rgba(196,149,106,0.09) 45%, transparent 72%)",
           }}
         />
 
@@ -156,7 +156,7 @@ export default function Home() {
 
           <p
             className="text-xs tracking-[0.22em] uppercase mb-6"
-            style={{ color: "#7A7068" }}
+            style={{ color: "#A09480" }}
           >
             Real-time intervention
           </p>
@@ -169,7 +169,7 @@ export default function Home() {
 
           <p
             className="text-lg md:text-xl max-w-xl mx-auto mb-10 leading-relaxed"
-            style={{ color: "#7A7068" }}
+            style={{ color: "#A09480" }}
           >
             A 60-second lock that interrupts the spiral before it takes you under.
           </p>
@@ -197,7 +197,7 @@ export default function Home() {
           {/* stats row */}
           <div
             className="flex flex-col sm:flex-row gap-6 sm:gap-12 items-center justify-center"
-            style={{ color: "#4A4640" }}
+            style={{ color: "#6A6058" }}
           >
             {[
               { value: "60s", label: "Reset lock" },
@@ -212,7 +212,7 @@ export default function Home() {
                   />
                 )}
                 <div className="text-center">
-                  <div className="text-2xl font-light" style={{ color: "#9A8E82" }}>
+                  <div className="text-2xl font-light" style={{ color: "#B4A898" }}>
                     {s.value}
                   </div>
                   <div className="text-xs tracking-wider uppercase mt-1">{s.label}</div>
@@ -233,7 +233,7 @@ export default function Home() {
         <FadeUp>
           <p
             className="text-xs tracking-[0.22em] uppercase text-center mb-5"
-            style={{ color: "#7A7068" }}
+            style={{ color: "#A09480" }}
           >
             You already know
           </p>
@@ -261,7 +261,7 @@ export default function Home() {
                 </div>
                 <p
                   className="text-lg font-light leading-relaxed"
-                  style={{ color: "#9A8E82" }}
+                  style={{ color: "#B4A898" }}
                 >
                   {text}
                 </p>
@@ -276,7 +276,7 @@ export default function Home() {
         <FadeUp>
           <p
             className="text-xs tracking-[0.22em] uppercase text-center mb-5"
-            style={{ color: "#7A7068" }}
+            style={{ color: "#A09480" }}
           >
             The system
           </p>
@@ -285,7 +285,7 @@ export default function Home() {
           </h2>
           <p
             className="text-center max-w-md mx-auto mb-16 text-base"
-            style={{ color: "#7A7068" }}
+            style={{ color: "#A09480" }}
           >
             Three moments. One reset.
           </p>
@@ -319,14 +319,14 @@ export default function Home() {
               >
                 <div
                   className="text-xs tracking-[0.18em] mb-6"
-                  style={{ color: "#3A3630" }}
+                  style={{ color: "#564E46" }}
                 >
                   {item.step}
                 </div>
                 <h3 className="font-serif text-2xl font-light mb-4">{item.title}</h3>
                 <p
                   className="text-sm leading-relaxed flex-1"
-                  style={{ color: "#7A7068" }}
+                  style={{ color: "#A09480" }}
                 >
                   {item.desc}
                 </p>
@@ -360,7 +360,7 @@ export default function Home() {
               <h2 className="font-serif text-3xl md:text-4xl font-light mb-4">
                 Feel it for yourself.
               </h2>
-              <p className="mb-8 text-sm" style={{ color: "#7A7068" }}>
+              <p className="mb-8 text-sm" style={{ color: "#A09480" }}>
                 This is what 60 seconds of control feels like.
               </p>
               <button
@@ -380,7 +380,7 @@ export default function Home() {
         <FadeUp>
           <p
             className="text-xs tracking-[0.22em] uppercase text-center mb-5"
-            style={{ color: "#7A7068" }}
+            style={{ color: "#A09480" }}
           >
             What's inside
           </p>
@@ -434,7 +434,7 @@ export default function Home() {
                   {f.symbol}
                 </div>
                 <h3 className="text-sm font-medium mb-2">{f.label}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "#7A7068" }}>
+                <p className="text-sm leading-relaxed" style={{ color: "#A09480" }}>
                   {f.desc}
                 </p>
               </div>
@@ -448,14 +448,14 @@ export default function Home() {
         <FadeUp>
           <p
             className="text-xs tracking-[0.22em] uppercase text-center mb-5"
-            style={{ color: "#7A7068" }}
+            style={{ color: "#A09480" }}
           >
             Pricing
           </p>
           <h2 className="font-serif text-4xl md:text-5xl font-light text-center mb-5">
             Simple. Honest.
           </h2>
-          <p className="text-center mb-16 text-base" style={{ color: "#7A7068" }}>
+          <p className="text-center mb-16 text-base" style={{ color: "#A09480" }}>
             Start free. Upgrade when you feel the difference.
           </p>
         </FadeUp>
@@ -466,20 +466,20 @@ export default function Home() {
           <FadeUp delay={0}>
             <div
               className="rounded-2xl p-7 flex flex-col h-full"
-              style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.06)" }}
+              style={{ background: "#1E1A16", border: "1px solid rgba(244,239,232,0.09)" }}
             >
-              <p className="text-xs tracking-widest uppercase mb-5" style={{ color: "#4A4640" }}>
+              <p className="text-xs tracking-widest uppercase mb-5" style={{ color: "#6A6058" }}>
                 Free
               </p>
               <div className="text-3xl font-light mb-1">$0</div>
-              <p className="text-sm mb-7 leading-relaxed flex-1" style={{ color: "#7A7068" }}>
+              <p className="text-sm mb-7 leading-relaxed flex-1" style={{ color: "#A09480" }}>
                 A taste — intentionally incomplete. Just enough to feel the difference.
               </p>
-              <ul className="space-y-3 mb-8 text-sm" style={{ color: "#7A7068" }}>
+              <ul className="space-y-3 mb-8 text-sm" style={{ color: "#A09480" }}>
                 {["3 interventions per day", "Basic 60-second lock", "One recovery prompt"].map(
                   (f) => (
                     <li key={f} className="flex items-start gap-3">
-                      <span style={{ color: "#3A3630", marginTop: 2 }}>–</span>
+                      <span style={{ color: "#564E46", marginTop: 2 }}>–</span>
                       {f}
                     </li>
                   )
@@ -499,8 +499,8 @@ export default function Home() {
             <div
               className="rounded-2xl p-7 flex flex-col h-full relative overflow-hidden"
               style={{
-                background: "#1C1712",
-                border: "1px solid rgba(196,149,106,0.28)",
+                background: "#252018",
+                border: "1px solid rgba(196,149,106,0.38)",
               }}
             >
               {/* top accent line */}
@@ -524,14 +524,14 @@ export default function Home() {
               </div>
               <div className="text-3xl font-light mb-1">
                 $5.99
-                <span className="text-base font-normal ml-1" style={{ color: "#4A4640" }}>
+                <span className="text-base font-normal ml-1" style={{ color: "#6A6058" }}>
                   /mo
                 </span>
               </div>
-              <p className="text-sm mb-7 leading-relaxed flex-1" style={{ color: "#9A8E82" }}>
+              <p className="text-sm mb-7 leading-relaxed flex-1" style={{ color: "#B4A898" }}>
                 The full StillOff system. Everything you need to break the cycle for good.
               </p>
-              <ul className="space-y-3 mb-8 text-sm" style={{ color: "#9A8E82" }}>
+              <ul className="space-y-3 mb-8 text-sm" style={{ color: "#B4A898" }}>
                 {[
                   "Unlimited interventions",
                   "Extended lock durations",
@@ -558,21 +558,21 @@ export default function Home() {
           <FadeUp delay={0.2}>
             <div
               className="rounded-2xl p-7 flex flex-col h-full"
-              style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.06)" }}
+              style={{ background: "#1E1A16", border: "1px solid rgba(244,239,232,0.09)" }}
             >
-              <p className="text-xs tracking-widest uppercase mb-5" style={{ color: "#4A4640" }}>
+              <p className="text-xs tracking-widest uppercase mb-5" style={{ color: "#6A6058" }}>
                 Premium
               </p>
               <div className="text-3xl font-light mb-1">
                 $9.99
-                <span className="text-base font-normal ml-1" style={{ color: "#4A4640" }}>
+                <span className="text-base font-normal ml-1" style={{ color: "#6A6058" }}>
                   /mo
                 </span>
               </div>
-              <p className="text-sm mb-7 leading-relaxed flex-1" style={{ color: "#7A7068" }}>
+              <p className="text-sm mb-7 leading-relaxed flex-1" style={{ color: "#A09480" }}>
                 For when the spiral is strongest.
               </p>
-              <ul className="space-y-3 mb-8 text-sm" style={{ color: "#7A7068" }}>
+              <ul className="space-y-3 mb-8 text-sm" style={{ color: "#A09480" }}>
                 {[
                   "Everything in Plus",
                   "Letter to My Future Self",
@@ -581,7 +581,7 @@ export default function Home() {
                   "Therapist prompt library",
                 ].map((f) => (
                   <li key={f} className="flex items-start gap-3">
-                    <span style={{ color: "#3A3630", marginTop: 2 }}>–</span>
+                    <span style={{ color: "#564E46", marginTop: 2 }}>–</span>
                     {f}
                   </li>
                 ))}
@@ -614,7 +614,7 @@ export default function Home() {
           <div className="relative max-w-2xl mx-auto">
             <p
               className="text-xs tracking-[0.22em] uppercase mb-6"
-              style={{ color: "#7A7068" }}
+              style={{ color: "#A09480" }}
             >
               Early access
             </p>
@@ -623,7 +623,7 @@ export default function Home() {
               <br />
               control.
             </h2>
-            <p className="text-lg mb-10" style={{ color: "#7A7068" }}>
+            <p className="text-lg mb-10" style={{ color: "#A09480" }}>
               Join the waitlist. Be first when StillOff launches.
             </p>
             <button
@@ -639,13 +639,13 @@ export default function Home() {
       {/* ══ FOOTER ═══════════════════════════════════════════════════════════ */}
       <footer
         className="px-6 py-10"
-        style={{ borderTop: "1px solid rgba(244,239,232,0.06)" }}
+        style={{ borderTop: "1px solid rgba(244,239,232,0.09)" }}
       >
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="font-serif text-lg" style={{ color: "#4A4640" }}>
+          <span className="font-serif text-lg" style={{ color: "#6A6058" }}>
             StillOff
           </span>
-          <div className="flex gap-6 text-xs" style={{ color: "#4A4640" }}>
+          <div className="flex gap-6 text-xs" style={{ color: "#6A6058" }}>
             <a href="/privacy" className="hover:text-[#F4EFE8] transition-colors">
               Privacy
             </a>
@@ -653,7 +653,7 @@ export default function Home() {
               Terms
             </a>
           </div>
-          <p className="text-xs" style={{ color: "#3A3630" }}>
+          <p className="text-xs" style={{ color: "#564E46" }}>
             © 2025 StillOff
           </p>
         </div>
@@ -682,7 +682,7 @@ export default function Home() {
               transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
               className="relative rounded-3xl p-10 max-w-sm w-full text-center overflow-hidden"
               style={{
-                background: "#161412",
+                background: "#1E1A16",
                 border: "1px solid rgba(244,239,232,0.10)",
               }}
             >
@@ -699,7 +699,7 @@ export default function Home() {
               <button
                 onClick={closeDemo}
                 className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full transition-colors text-lg"
-                style={{ background: "rgba(244,239,232,0.07)", color: "#7A7068" }}
+                style={{ background: "rgba(244,239,232,0.07)", color: "#A09480" }}
                 aria-label="Close"
               >
                 ×
@@ -722,12 +722,12 @@ export default function Home() {
                     >
                       <p
                         className="text-xs tracking-[0.18em] uppercase mb-4"
-                        style={{ color: "#7A7068" }}
+                        style={{ color: "#A09480" }}
                       >
                         Lock active
                       </p>
                       <p className="font-serif text-3xl font-light mb-2">Breathe.</p>
-                      <p className="text-sm" style={{ color: "#7A7068" }}>
+                      <p className="text-sm" style={{ color: "#A09480" }}>
                         60 seconds. Just this.
                       </p>
                     </motion.div>
@@ -753,7 +753,7 @@ export default function Home() {
                       </p>
                       <p
                         className="text-sm mb-8 leading-relaxed"
-                        style={{ color: "#7A7068" }}
+                        style={{ color: "#A09480" }}
                       >
                         That's what control feels like.
                       </p>
