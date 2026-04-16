@@ -593,7 +593,7 @@ export default function Home() {
             </button>
             <button
               onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
-              className="cta-glow font-medium px-7 py-4 rounded-2xl text-base w-full sm:w-auto border"
+              className="font-medium px-7 py-4 rounded-2xl text-base w-full sm:w-auto border"
               style={{ borderColor: "rgba(244,239,232,0.18)", color: "#F4EFE8" }}
             >
               Get early access →
@@ -635,11 +635,10 @@ export default function Home() {
           </p>
         </FadeUp>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
           {[
             "One notification. Then forty-five minutes gone.",
             "You said five minutes. You meant it. It\u2019s been an hour.",
-            "You know you should stop. Your thumb keeps scrolling.",
           ].map((text, i) => (
             <FadeUp key={i} delay={i * 0.1}>
               <div
@@ -692,6 +691,61 @@ export default function Home() {
             </FadeUp>
           ))}
         </div>
+      </section>
+
+      {/* ══ WHY DIFFERENT ════════════════════════════════════════════════════ */}
+      <section className="px-6 py-20 max-w-5xl mx-auto">
+        <FadeUp>
+          <h2 className="font-serif text-4xl md:text-5xl font-light text-center mb-14 leading-tight max-w-2xl mx-auto">
+            Everything else tells you to stop.<br />StillOff is built to stop you.
+          </h2>
+        </FadeUp>
+
+        <FadeUp delay={0.08}>
+          <div
+            className="overflow-hidden rounded-2xl"
+            style={{ border: "1px solid rgba(244,239,232,0.08)" }}
+          >
+            <div
+              className="grid grid-cols-2"
+              style={{ background: "#1A1612", borderBottom: "1px solid rgba(244,239,232,0.08)" }}
+            >
+              <div className="px-7 py-4 text-xs tracking-[0.22em] uppercase" style={{ color: "#564E46" }}>
+                Other apps
+              </div>
+              <div
+                className="px-7 py-4 text-xs tracking-[0.22em] uppercase"
+                style={{ color: "#A09480", borderLeft: "1px solid rgba(244,239,232,0.08)" }}
+              >
+                StillOff
+              </div>
+            </div>
+            {[
+              ["Track your usage", "Stop the behavior"],
+              ["Suggest breaks", "Intervene in the moment"],
+              ["Rely on your discipline", "Remove the decision"],
+              ["Easy to bypass", "Designed to hold"],
+              ["Work when you're motivated", "Work when you're not"],
+            ].map(([left, right], i) => (
+              <div
+                key={i}
+                className="grid grid-cols-2"
+                style={{
+                  background: i % 2 === 0 ? "#141210" : "#161410",
+                  borderBottom: i < 4 ? "1px solid rgba(244,239,232,0.05)" : undefined,
+                }}
+              >
+                <div className="px-7 py-5 text-sm" style={{ color: "#6A6058" }}>{left}</div>
+                <div
+                  className="px-7 py-5 text-sm"
+                  style={{ color: "#F4EFE8", borderLeft: "1px solid rgba(244,239,232,0.06)" }}
+                >
+                  {right}
+                </div>
+              </div>
+            ))}
+          </div>
+        </FadeUp>
       </section>
 
       {/* ══ HOW IT WORKS ═════════════════════════════════════════════════════ */}
@@ -856,61 +910,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══ WHY DIFFERENT ════════════════════════════════════════════════════ */}
-      <section className="px-6 py-20 max-w-5xl mx-auto">
-        <FadeUp>
-          <h2 className="font-serif text-4xl md:text-5xl font-light text-center mb-14 leading-tight max-w-2xl mx-auto">
-            Everything else tells you to stop.<br />StillOff is built to stop you.
-          </h2>
-        </FadeUp>
-
-        <FadeUp delay={0.08}>
-          <div
-            className="overflow-hidden rounded-2xl"
-            style={{ border: "1px solid rgba(244,239,232,0.08)" }}
-          >
-            <div
-              className="grid grid-cols-2"
-              style={{ background: "#1A1612", borderBottom: "1px solid rgba(244,239,232,0.08)" }}
-            >
-              <div className="px-7 py-4 text-xs tracking-[0.22em] uppercase" style={{ color: "#564E46" }}>
-                Other apps
-              </div>
-              <div
-                className="px-7 py-4 text-xs tracking-[0.22em] uppercase"
-                style={{ color: "#A09480", borderLeft: "1px solid rgba(244,239,232,0.08)" }}
-              >
-                StillOff
-              </div>
-            </div>
-            {[
-              ["Track your usage", "Stop the behavior"],
-              ["Suggest breaks", "Intervene in the moment"],
-              ["Rely on your discipline", "Remove the decision"],
-              ["Easy to bypass", "Designed to hold"],
-              ["Work when you're motivated", "Work when you're not"],
-            ].map(([left, right], i) => (
-              <div
-                key={i}
-                className="grid grid-cols-2"
-                style={{
-                  background: i % 2 === 0 ? "#141210" : "#161410",
-                  borderBottom: i < 4 ? "1px solid rgba(244,239,232,0.05)" : undefined,
-                }}
-              >
-                <div className="px-7 py-5 text-sm" style={{ color: "#6A6058" }}>{left}</div>
-                <div
-                  className="px-7 py-5 text-sm"
-                  style={{ color: "#F4EFE8", borderLeft: "1px solid rgba(244,239,232,0.06)" }}
-                >
-                  {right}
-                </div>
-              </div>
-            ))}
-          </div>
-        </FadeUp>
-      </section>
-
       {/* ══ BIG QUOTE ════════════════════════════════════════════════════════ */}
       <section className="px-6 py-20 max-w-4xl mx-auto text-center">
         <FadeUp>
@@ -997,62 +996,6 @@ export default function Home() {
               </div>
             </div>
           </FadeUp>
-        </div>
-      </section>
-
-      {/* ══ FAQ ══════════════════════════════════════════════════════════════ */}
-      <section className="px-6 py-20 max-w-3xl mx-auto">
-        <FadeUp>
-          <p className="text-xs tracking-[0.22em] uppercase text-center mb-5" style={{ color: "#A09480" }}>
-            Questions
-          </p>
-          <h2 className="font-serif text-4xl font-light text-center mb-12">Common questions</h2>
-        </FadeUp>
-
-        <div className="space-y-2">
-          {FAQ_ITEMS.map((item, i) => (
-            <FadeUp key={i} delay={i * 0.04}>
-              <div
-                className="rounded-2xl overflow-hidden"
-                style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.06)" }}
-              >
-                <button
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full flex items-center justify-between px-6 py-5 text-left text-sm font-medium transition-colors hover:text-[#C4956A]"
-                >
-                  <span>{item.q}</span>
-                  <span
-                    className="ml-4 flex-shrink-0 text-lg transition-transform duration-300"
-                    style={{
-                      color: "#564E46",
-                      transform: openFaq === i ? "rotate(45deg)" : "rotate(0deg)",
-                    }}
-                  >
-                    +
-                  </span>
-                </button>
-                <AnimatePresence initial={false}>
-                  {openFaq === i && (
-                    <motion.div
-                      key="answer"
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                      style={{ overflow: "hidden" }}
-                    >
-                      <p
-                        className="px-6 pb-5 text-sm leading-7"
-                        style={{ color: "#A09480", borderTop: "1px solid rgba(244,239,232,0.05)" }}
-                      >
-                        {item.a}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </FadeUp>
-          ))}
         </div>
       </section>
 
@@ -1185,6 +1128,62 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ══ FAQ ══════════════════════════════════════════════════════════════ */}
+      <section className="px-6 py-20 max-w-3xl mx-auto">
+        <FadeUp>
+          <p className="text-xs tracking-[0.22em] uppercase text-center mb-5" style={{ color: "#A09480" }}>
+            Questions
+          </p>
+          <h2 className="font-serif text-4xl font-light text-center mb-12">Common questions</h2>
+        </FadeUp>
+
+        <div className="space-y-2">
+          {FAQ_ITEMS.map((item, i) => (
+            <FadeUp key={i} delay={i * 0.04}>
+              <div
+                className="rounded-2xl overflow-hidden"
+                style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.06)" }}
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full flex items-center justify-between px-6 py-5 text-left text-sm font-medium transition-colors hover:text-[#C4956A]"
+                >
+                  <span>{item.q}</span>
+                  <span
+                    className="ml-4 flex-shrink-0 text-lg transition-transform duration-300"
+                    style={{
+                      color: "#564E46",
+                      transform: openFaq === i ? "rotate(45deg)" : "rotate(0deg)",
+                    }}
+                  >
+                    +
+                  </span>
+                </button>
+                <AnimatePresence initial={false}>
+                  {openFaq === i && (
+                    <motion.div
+                      key="answer"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <p
+                        className="px-6 pb-5 text-sm leading-7"
+                        style={{ color: "#A09480", borderTop: "1px solid rgba(244,239,232,0.05)" }}
+                      >
+                        {item.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </FadeUp>
+          ))}
+        </div>
+      </section>
+
       {/* ══ WAITLIST ═════════════════════════════════════════════════════════ */}
       <section
         ref={waitlistRef as React.RefObject<HTMLElement>}
@@ -1207,11 +1206,14 @@ export default function Home() {
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="relative max-w-xl mx-auto"
             >
-              <div className="flex items-center justify-center gap-2 mb-6">
-                <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#C4956A" }} />
-                <p className="text-sm" style={{ color: "#A09480" }}>
-                  <CountUp from={2727} to={2847} /> people on the waitlist
+              <div className="mb-8 text-center">
+                <p className="font-serif text-6xl md:text-7xl font-light mb-2" style={{ color: "#C4956A" }}>
+                  <CountUp from={2727} to={2847} />
                 </p>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#C4956A" }} />
+                  <p className="text-sm" style={{ color: "#A09480" }}>people already waiting</p>
+                </div>
               </div>
 
               <p className="text-xs tracking-[0.22em] uppercase mb-6" style={{ color: "#A09480" }}>
@@ -1331,14 +1333,13 @@ export default function Home() {
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.25 }}
             onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
-            className="fixed bottom-5 right-5 z-40 rounded-full px-5 py-2.5 text-xs font-medium border backdrop-blur-md transition-colors hover:text-[#F4EFE8]"
+            className="cta-glow fixed bottom-5 right-5 z-40 rounded-full px-5 py-2.5 text-xs font-medium"
             style={{
-              background: "rgba(19,17,14,0.90)",
-              border: "1px solid rgba(244,239,232,0.12)",
-              color: "#A09480",
+              background: "#F4EFE8",
+              color: "#0E0D0B",
             }}
           >
-            Join waitlist
+            Get early access
           </motion.button>
         )}
       </AnimatePresence>
