@@ -37,7 +37,8 @@
       "Bash(kill -9 1968 1580 1513)",
       "Bash(awk '{print $1}')",
       "Bash(xargs kill *)",
-      "Bash(npx kill-port *)"
+      "Bash(npx kill-port *)",
+      "Bash(grep -E \"\\\\.\\(tsx|ts|css|json\\)$\")"
     ]
   }
 }

@@ -213,15 +213,18 @@ function DemoModal({
   onClose,
   onComplete,
   onSubmit,
+  submitting,
 }: {
   open: boolean;
   onClose: () => void;
   onComplete: () => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  submitting?: boolean;
 }) {
   const reduced = useReducedMotion();
   const [phase, setPhase] = useState<"intro" | "breathing" | "ending" | "cta">("intro");
   const [label, setLabel] = useState("Breathe in");
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) {
@@ -229,6 +232,7 @@ function DemoModal({
       return;
     }
     document.body.style.overflow = "hidden";
+    const t = setTimeout(() => closeRef.current?.focus(), 50);
     const breathMs = reduced ? 5000 : 60000;
     const timers: ReturnType<typeof setTimeout>[] = [];
 
@@ -253,6 +257,7 @@ function DemoModal({
     timers.push(setTimeout(() => { setPhase("cta"); onComplete(); }, 1200 + breathMs + 3500));
 
     return () => {
+      clearTimeout(t);
       document.body.style.overflow = "";
       timers.forEach(clearTimeout);
     };
@@ -267,7 +272,7 @@ function DemoModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-50 flex items-center justify-center px-6"
+          className="fixed inset-0 z-[60] flex items-center justify-center px-6"
           style={{ background: "rgba(0,0,0,0.92)", backdropFilter: "blur(16px)" }}
           onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
@@ -277,6 +282,9 @@ function DemoModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 16 }}
             transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="StillOff 60-second lock demo"
             className="relative rounded-3xl p-10 max-w-md w-full text-center overflow-hidden"
             style={{ background: "#1A1612", border: "1px solid rgba(244,239,232,0.10)" }}
           >
@@ -289,6 +297,7 @@ function DemoModal({
 
             {/* close — large, always visible */}
             <button
+              ref={closeRef}
               onClick={onClose}
               className="absolute top-4 right-4 w-11 h-11 flex items-center justify-center rounded-full border transition-colors hover:border-white/30 hover:text-[#F4EFE8] z-10"
               style={{
@@ -401,10 +410,11 @@ function DemoModal({
                         />
                         <button
                           type="submit"
+                          disabled={submitting}
                           className="cta-glow rounded-xl px-5 py-2.5 text-sm font-medium"
-                          style={{ background: "#F4EFE8", color: "#0E0D0B" }}
+                          style={{ background: "#F4EFE8", color: "#0E0D0B", opacity: submitting ? 0.6 : 1 }}
                         >
-                          Join
+                          {submitting ? "Joining…" : "Join"}
                         </button>
                       </form>
                       <p className="text-xs mt-2" style={{ color: "#564E46" }}>
@@ -444,6 +454,7 @@ export default function Home() {
   const [billingYearly, setBillingYearly] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [waitlistPosition, setWaitlistPosition] = useState(0);
   const waitlistRef = useRef<HTMLElement | null>(null);
 
@@ -471,6 +482,7 @@ export default function Home() {
     e.preventDefault();
     const form = e.currentTarget;
     const email = (form.elements.namedItem("email") as HTMLInputElement)?.value;
+    setSubmitting(true);
     try {
       await fetch("https://formspree.io/f/mzdklnwv", {
         method: "POST",
@@ -483,6 +495,8 @@ export default function Home() {
       form.reset();
     } catch {
       showToast("Something went wrong. Try again.");
+    } finally {
+      setSubmitting(false);
     }
   }, [showToast]);
 
@@ -1358,10 +1372,11 @@ export default function Home() {
                 />
                 <button
                   type="submit"
+                  disabled={submitting}
                   className="cta-glow rounded-2xl px-6 py-3.5 text-sm font-medium"
-                  style={{ background: "#F4EFE8", color: "#0E0D0B" }}
+                  style={{ background: "#F4EFE8", color: "#0E0D0B", opacity: submitting ? 0.6 : 1 }}
                 >
-                  Get early access
+                  {submitting ? "Joining…" : "Get early access"}
                 </button>
               </form>
               <p className="text-xs" style={{ color: "#564E46" }}>
@@ -1462,7 +1477,7 @@ export default function Home() {
       </AnimatePresence>
 
       {/* ══ DEMO MODAL ═══════════════════════════════════════════════════════ */}
-      <DemoModal open={demoOpen} onClose={handleDemoClose} onComplete={handleDemoComplete} onSubmit={handleSubmit} />
+      <DemoModal open={demoOpen} onClose={handleDemoClose} onComplete={handleDemoComplete} onSubmit={handleSubmit} submitting={submitting} />
 
       {/* ══ TOAST ════════════════════════════════════════════════════════════ */}
       <AnimatePresence>

@@ -1,0 +1,41 @@
+You are editing only the current app/page.tsx.
+Hard rules (do not break these):
+
+Do NOT rebuild the page from scratch
+Do NOT delete sections
+Do NOT change the cinematic hero or orb
+Do NOT change prices or features
+Do NOT add new sections
+
+Apply ONLY these fixes:
+
+Top Navigation
+Add a clean fixed nav at the top of <main>:
+Logo left: “StillOff”
+Center links: “How it works”, “Pricing”
+Right CTA: “Get early access” (with glow)
+
+CTA Glow
+Add the .cta-glow class (if missing) and apply it only to primary action buttons. Do not apply to secondary buttons.
+Reorder the sections to this exact order (move existing sections, do not delete any):
+Hero
+The Spiral (trim to 2 cards max if possible)
+Why Different (move comparison table here)
+How It Works
+Demo Callout
+Soft Landing
+Proof / Testimonials
+Pricing
+FAQ (directly below pricing)
+Waitlist / final close
+
+Sticky CTA
+Change text to “Get early access” (with glow).
+Waitlist number
+Make the waitlist count (2,847) much larger and more prominent (headline size).
+Demo Modal
+Fix: orb must not overlap text, close button large and obvious near content, modal centered and self-contained, background dimmed/blurred.
+
+Run npm run build when done.
+Return ONLY the full updated app/page.tsx code + confirmation that build passed.
+This is the final pass. No extra changes. No drift.
