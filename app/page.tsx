@@ -91,6 +91,75 @@ function StillOrb({ size = 280, intense = false }: { size?: number; intense?: bo
   );
 }
 
+/* ─── Phone Mockup ──────────────────────────────────────────────────────── */
+function PhoneMockup() {
+  return (
+    <div className="relative select-none" style={{ width: 248, height: 494 }}>
+      {/* ambient glow behind phone */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          inset: "-70px",
+          background: "radial-gradient(ellipse 55% 45% at 50% 50%, rgba(196,149,106,0.28) 0%, transparent 68%)",
+          filter: "blur(24px)",
+        }}
+      />
+      {/* phone frame */}
+      <div
+        className="relative w-full h-full flex flex-col items-center justify-center"
+        style={{
+          borderRadius: 40,
+          background: "linear-gradient(160deg, #1C1712 0%, #0E0C0A 100%)",
+          border: "1.5px solid rgba(244,239,232,0.16)",
+          boxShadow: "0 48px 120px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.07)",
+          overflow: "hidden",
+          padding: "48px 24px 36px",
+        }}
+      >
+        {/* dynamic island */}
+        <div
+          className="absolute"
+          style={{
+            top: 16,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: 90,
+            height: 26,
+            borderRadius: 13,
+            background: "#0A0907",
+            border: "1px solid rgba(244,239,232,0.08)",
+          }}
+        />
+        {/* screen glow */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse 85% 65% at 50% 42%, rgba(110,70,55,0.50) 0%, transparent 70%)",
+          }}
+        />
+        {/* content */}
+        <div className="relative flex flex-col items-center gap-3 text-center">
+          <p style={{ fontSize: 9, letterSpacing: "0.30em", textTransform: "uppercase", color: "#564E46" }}>
+            StillOff · Lock active
+          </p>
+          <StillOrb size={92} intense />
+          <p style={{ fontSize: 10, letterSpacing: "0.24em", textTransform: "uppercase", color: "#A09480" }}>
+            Breathe in
+          </p>
+          <div style={{ fontFamily: "var(--font-serif, Georgia, serif)", fontSize: 46, fontWeight: 300, color: "#C4956A", lineHeight: 1, marginTop: 2 }}>
+            0:52
+          </div>
+          <p style={{ fontSize: 11, color: "#6A6058" }}>Stay with it.</p>
+          <div style={{ margin: "10px 0 8px", width: 140, height: 1, background: "rgba(244,239,232,0.07)" }} />
+          <p style={{ fontSize: 9, color: "#3A2E28", letterSpacing: "0.12em" }}>
+            Apps resuming in 15 min
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Soft Landing Countdown ────────────────────────────────────────────── */
 function SoftLandingCard() {
   const ref = useRef<HTMLDivElement>(null);
@@ -523,24 +592,24 @@ export default function Home() {
 
       {/* ══ NAV ══════════════════════════════════════════════════════════════ */}
       <nav
-        className="fixed top-0 inset-x-0 z-50 h-16 flex items-center"
+        className="fixed top-0 inset-x-0 z-50 h-[72px] flex items-center"
         style={{
-          background: "rgba(19,17,14,0.85)",
-          backdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(244,239,232,0.08)",
+          background: "rgba(19,17,14,0.88)",
+          backdropFilter: "blur(24px)",
+          borderBottom: "1px solid rgba(244,239,232,0.09)",
         }}
       >
         <div className="max-w-6xl mx-auto w-full px-6 flex items-center justify-between">
-          <span className="font-serif text-xl tracking-tight">StillOff</span>
+          <span className="font-serif text-2xl tracking-tight" style={{ color: "#F4EFE8" }}>StillOff</span>
 
-          <div className="hidden md:flex gap-8 text-sm" style={{ color: "#A09480" }}>
+          <div className="hidden md:flex gap-10 text-[15px] font-light" style={{ color: "#C4B9A8" }}>
             <a href="#how" className="hover:text-[#F4EFE8] transition-colors duration-200">How it works</a>
             <a href="#pricing" className="hover:text-[#F4EFE8] transition-colors duration-200">Pricing</a>
           </div>
 
           <button
             onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
-            className="cta-glow text-sm font-medium px-4 py-2 rounded-xl"
+            className="cta-glow text-sm font-medium px-5 py-2.5 rounded-xl"
             style={{ background: "#F4EFE8", color: "#0E0D0B" }}
           >
             Get early access
@@ -549,73 +618,93 @@ export default function Home() {
       </nav>
 
       {/* ══ HERO ═════════════════════════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-16 overflow-hidden">
+      <section className="relative min-h-screen flex flex-col justify-center px-6 pt-[72px] pb-16 overflow-hidden">
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: "radial-gradient(ellipse 65% 55% at 50% 48%, rgba(110,70,55,0.28) 0%, rgba(196,149,106,0.09) 45%, transparent 72%)",
+            background: "radial-gradient(ellipse 75% 60% at 62% 52%, rgba(110,70,55,0.32) 0%, rgba(196,149,106,0.10) 45%, transparent 72%)",
           }}
         />
 
         <motion.div
-          className="relative flex flex-col items-center"
-          initial={{ opacity: 0, y: 20 }}
+          className="relative w-full max-w-6xl mx-auto"
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="mb-10">
-            <StillOrb size={200} />
-          </div>
+          <div className="grid md:grid-cols-[1fr_auto] gap-12 lg:gap-20 items-center">
 
-          <p className="text-xs tracking-[0.22em] uppercase mb-6" style={{ color: "#A09480" }}>
-            You picked up your phone 84 times today.
-          </p>
-
-          <h1 className="font-serif text-5xl md:text-7xl font-light leading-[1.06] mb-7 max-w-3xl">
-            {demoCompleted ? (
-              <>Welcome back.<br /><span style={{ color: "#C4956A" }}>Ready to lock it in?</span></>
-            ) : (
-              <>When you can&apos;t stop,<br /><span style={{ color: "#C4956A" }}>StillOff</span> does.</>
-            )}
-          </h1>
-
-          <p className="text-lg md:text-xl max-w-xl mx-auto mb-10 leading-relaxed" style={{ color: "#A09480" }}>
-            A 60-second lock that interrupts the spiral before it takes you under.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-16">
-            <button
-              onClick={openDemo}
-              className="cta-glow font-medium px-7 py-4 rounded-2xl text-base w-full sm:w-auto"
-              style={{ background: "#F4EFE8", color: "#0E0D0B" }}
-            >
-              Try the 60-second lock
-            </button>
-            <button
-              onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
-              className="font-medium px-7 py-4 rounded-2xl text-base w-full sm:w-auto border"
-              style={{ borderColor: "rgba(244,239,232,0.18)", color: "#F4EFE8" }}
-            >
-              Get early access →
-            </button>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 items-center justify-center" style={{ color: "#6A6058" }}>
-            {[
-              { value: "186×", label: "avg. daily pickups" },
-              { value: "4.3h", label: "avg. screen time" },
-              { value: "60s", label: "reset duration" },
-            ].map((s, i) => (
-              <div key={i} className="flex items-center gap-6 sm:gap-12">
-                {i > 0 && (
-                  <div className="hidden sm:block w-px h-7" style={{ background: "rgba(244,239,232,0.07)" }} />
-                )}
-                <div className="text-center">
-                  <div className="text-2xl font-light" style={{ color: "#B4A898" }}>{s.value}</div>
-                  <div className="text-xs tracking-wider uppercase mt-1">{s.label}</div>
-                </div>
+            {/* ── Left: copy ── */}
+            <div className="flex flex-col items-start">
+              {/* badge */}
+              <div className="flex items-center gap-2 mb-8 px-3 py-1.5 rounded-full"
+                style={{ background: "rgba(196,149,106,0.10)", border: "1px solid rgba(196,149,106,0.22)" }}>
+                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#C4956A" }} />
+                <span className="text-xs tracking-[0.22em] uppercase" style={{ color: "#C4956A" }}>
+                  Real-time intervention · iOS
+                </span>
               </div>
-            ))}
+
+              <h1 className="font-serif font-light leading-[1.04] mb-7"
+                style={{ fontSize: "clamp(48px, 6.5vw, 90px)", color: "#F4EFE8" }}>
+                {demoCompleted ? (
+                  <>Welcome back.<br /><span style={{ color: "#C4956A" }}>Ready to lock in?</span></>
+                ) : (
+                  <>When you can&apos;t stop,<br /><em style={{ color: "#C4956A", fontStyle: "normal" }}>StillOff does.</em></>
+                )}
+              </h1>
+
+              <p className="text-xl leading-relaxed mb-10 max-w-lg" style={{ color: "#A09480" }}>
+                A 60-second breathing lock that interrupts the spiral the moment it starts — before the next hour disappears.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3 mb-14 w-full sm:w-auto">
+                <button
+                  onClick={openDemo}
+                  className="cta-glow font-medium px-8 py-4 rounded-2xl text-base"
+                  style={{ background: "#F4EFE8", color: "#0E0D0B" }}
+                >
+                  Try the 60-second lock
+                </button>
+                <button
+                  onClick={() => document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" })}
+                  className="font-medium px-8 py-4 rounded-2xl text-base border transition-colors hover:border-white/30"
+                  style={{ borderColor: "rgba(244,239,232,0.18)", color: "#D4C8BC" }}
+                >
+                  Get early access →
+                </button>
+              </div>
+
+              {/* stats — headline scale */}
+              <div className="flex gap-10 items-start">
+                {[
+                  { value: "186×", label: "daily pickups" },
+                  { value: "4.3h", label: "avg screen time" },
+                  { value: "60s", label: "to reset" },
+                ].map((s, i) => (
+                  <div key={i} className="flex items-start gap-10">
+                    {i > 0 && (
+                      <div className="w-px mt-1" style={{ height: 40, background: "rgba(244,239,232,0.10)" }} />
+                    )}
+                    <div>
+                      <div className="font-serif text-4xl font-light leading-none" style={{ color: "#C4956A" }}>{s.value}</div>
+                      <div className="text-xs tracking-wider uppercase mt-2" style={{ color: "#6A6058" }}>{s.label}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Right: phone ── */}
+            <motion.div
+              className="hidden md:flex justify-center items-center"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <PhoneMockup />
+            </motion.div>
+
           </div>
         </motion.div>
 
@@ -627,27 +716,30 @@ export default function Home() {
       {/* ══ THE SPIRAL ═══════════════════════════════════════════════════════ */}
       <section className="px-6 py-28 max-w-5xl mx-auto">
         <FadeUp>
-          <p className="font-serif text-3xl md:text-4xl font-light leading-snug max-w-2xl mb-6" style={{ color: "#F4EFE8" }}>
-            You didn&apos;t decide to spiral. It was already happening — the moment you picked it up.
+          <p className="font-serif text-4xl md:text-5xl font-light leading-snug max-w-2xl mb-6" style={{ color: "#F4EFE8" }}>
+            You didn&apos;t decide to spiral. It was already happening.
           </p>
-          <p className="max-w-xl text-base leading-7 mb-16" style={{ color: "#A09480" }}>
-            StillOff steps in at that exact moment. Before the loop closes. Before the next ten minutes disappear.
+          <p className="max-w-lg text-lg leading-7 mb-16" style={{ color: "#A09480" }}>
+            StillOff steps in at that exact moment. Before the loop closes. Before the next hour disappears.
           </p>
         </FadeUp>
 
-        <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-5">
           {[
             "One notification. Then forty-five minutes gone.",
             "You said five minutes. You meant it. It\u2019s been an hour.",
           ].map((text, i) => (
             <FadeUp key={i} delay={i * 0.1}>
               <div
-                className="rounded-2xl p-8 h-full"
-                style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.06)" }}
+                className="rounded-2xl p-10 h-full"
+                style={{
+                  background: "#161210",
+                  border: "1px solid rgba(244,239,232,0.07)",
+                  borderLeft: "3px solid rgba(196,149,106,0.45)",
+                }}
               >
-                <div className="mb-5 text-xl" style={{ color: "#3A2E28" }}>◎</div>
-                <p className="text-lg font-light leading-relaxed" style={{ color: "#B4A898" }}>
-                  {text}
+                <p className="font-serif text-2xl md:text-3xl font-light leading-snug" style={{ color: "#D4C8BC" }}>
+                  &ldquo;{text}&rdquo;
                 </p>
               </div>
             </FadeUp>
@@ -782,13 +874,16 @@ export default function Home() {
           ].map((item, i) => (
             <FadeUp key={i} delay={i * 0.12}>
               <div
-                className="rounded-2xl p-8 h-full flex flex-col"
+                className="rounded-2xl p-8 h-full flex flex-col relative overflow-hidden"
                 style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.06)" }}
               >
-                <div className="text-xs tracking-[0.18em] mb-6" style={{ color: "#564E46" }}>
+                <div
+                  className="font-serif font-light leading-none mb-4 select-none"
+                  style={{ fontSize: 72, color: "rgba(196,149,106,0.18)" }}
+                >
                   {item.step}
                 </div>
-                <h3 className="font-serif text-2xl font-light mb-4">{item.title}</h3>
+                <h3 className="font-serif text-2xl font-light mb-3">{item.title}</h3>
                 <p className="text-sm leading-relaxed flex-1" style={{ color: "#A09480" }}>
                   {item.desc}
                 </p>
@@ -812,14 +907,14 @@ export default function Home() {
               }}
             />
             <div className="relative flex flex-col items-center">
-              <div className="mb-8"><StillOrb size={88} /></div>
-              <h2 className="font-serif text-3xl md:text-4xl font-light mb-4">Feel it for yourself.</h2>
-              <p className="mb-8 text-sm" style={{ color: "#A09480" }}>
+              <div className="mb-8"><StillOrb size={120} /></div>
+              <h2 className="font-serif text-4xl md:text-5xl font-light mb-4">Feel it for yourself.</h2>
+              <p className="mb-8 text-base" style={{ color: "#A09480" }}>
                 This is what 60 seconds of control feels like.
               </p>
               <button
                 onClick={openDemo}
-                className="cta-glow font-medium px-8 py-4 rounded-2xl text-base"
+                className="cta-glow font-medium px-8 py-5 rounded-2xl text-base"
                 style={{ background: "#F4EFE8", color: "#0E0D0B" }}
               >
                 Try the 60-second lock
@@ -911,14 +1006,18 @@ export default function Home() {
       </section>
 
       {/* ══ BIG QUOTE ════════════════════════════════════════════════════════ */}
-      <section className="px-6 py-20 max-w-4xl mx-auto text-center">
+      <section className="px-6 py-28 overflow-hidden"
+        style={{ background: "linear-gradient(180deg, transparent 0%, rgba(196,149,106,0.06) 40%, rgba(196,149,106,0.04) 60%, transparent 100%)" }}>
         <FadeUp>
-          <p className="font-serif text-3xl md:text-4xl font-light leading-snug" style={{ color: "#F4EFE8" }}>
-            You don&apos;t need more guilt about your habits.
-          </p>
-          <p className="mt-5 text-lg leading-8" style={{ color: "#A09480" }}>
-            You need a way to break them while they&apos;re happening.
-          </p>
+          <div className="max-w-4xl mx-auto text-center">
+            <p className="font-serif text-4xl md:text-6xl font-light leading-snug" style={{ color: "#F4EFE8" }}>
+              You don&apos;t need more guilt<br />about your habits.
+            </p>
+            <p className="mt-7 text-xl leading-8" style={{ color: "#A09480" }}>
+              You need a way to break them while they&apos;re happening.
+            </p>
+            <div className="mt-10 w-16 h-px mx-auto" style={{ background: "rgba(196,149,106,0.4)" }} />
+          </div>
         </FadeUp>
       </section>
 
@@ -1047,19 +1146,31 @@ export default function Home() {
               <div
                 className="rounded-2xl p-7 flex flex-col h-full relative overflow-hidden"
                 style={{
-                  background: tier.highlighted ? "#252018" : "#1E1A16",
+                  background: tier.highlighted ? "#2A2016" : "#1A1712",
                   border: tier.highlighted
-                    ? "1px solid rgba(196,149,106,0.38)"
+                    ? "2px solid rgba(196,149,106,0.55)"
                     : "1px solid rgba(244,239,232,0.09)",
+                  boxShadow: tier.highlighted
+                    ? "0 0 60px rgba(196,149,106,0.12), 0 24px 48px rgba(0,0,0,0.3)"
+                    : "none",
+                  transform: tier.highlighted ? "scale(1.02)" : "none",
                 }}
               >
                 {tier.highlighted && (
-                  <div
-                    className="absolute top-0 inset-x-0 h-px"
-                    style={{
-                      background: "linear-gradient(90deg, transparent, rgba(196,149,106,0.6), transparent)",
-                    }}
-                  />
+                  <>
+                    <div
+                      className="absolute top-0 inset-x-0 h-[2px]"
+                      style={{
+                        background: "linear-gradient(90deg, transparent, rgba(196,149,106,0.95), transparent)",
+                      }}
+                    />
+                    <div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: "radial-gradient(ellipse 70% 40% at 50% 0%, rgba(196,149,106,0.08) 0%, transparent 60%)",
+                      }}
+                    />
+                  </>
                 )}
 
                 <div className="flex items-center justify-between mb-5">
@@ -1216,14 +1327,16 @@ export default function Home() {
                 </div>
               </div>
 
-              <p className="text-xs tracking-[0.22em] uppercase mb-6" style={{ color: "#A09480" }}>
-                Early access
+              <p className="text-xs tracking-[0.28em] uppercase mb-6 px-3 py-1.5 rounded-full inline-block"
+                style={{ color: "#C4956A", background: "rgba(196,149,106,0.10)", border: "1px solid rgba(196,149,106,0.22)" }}>
+                Early access — limited spots
               </p>
-              <h2 className="font-serif text-5xl md:text-6xl font-light mb-6 leading-tight">
-                Take back<br />control.
+              <h2 className="font-serif font-light mb-6 leading-tight"
+                style={{ fontSize: "clamp(52px, 7vw, 88px)", color: "#F4EFE8" }}>
+                Take back<br /><span style={{ color: "#C4956A" }}>control.</span>
               </h2>
-              <p className="text-lg mb-10" style={{ color: "#A09480" }}>
-                Join the waitlist. Be first when StillOff launches.
+              <p className="text-xl mb-10" style={{ color: "#A09480" }}>
+                Join thousands already waiting. First email when it launches.
               </p>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row max-w-md mx-auto mb-4">
