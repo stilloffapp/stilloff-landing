@@ -484,11 +484,12 @@ export default function Home() {
     const email = (form.elements.namedItem("email") as HTMLInputElement)?.value;
     setSubmitting(true);
     try {
-      await fetch("https://formspree.io/f/mzdklnwv", {
+      const res = await fetch(`https://formspree.io/f/${process.env.NEXT_PUBLIC_FORMSPREE_ID}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, _subject: "StillOff waitlist" }),
       });
+      if (!res.ok) throw new Error("Submission failed");
       const pos = Math.floor(Math.random() * 25) + 2841;
       setWaitlistPosition(pos);
       setSubmitted(true);
@@ -1428,8 +1429,12 @@ export default function Home() {
                   </button>
                   <button
                     onClick={async () => {
-                      await navigator.clipboard.writeText("https://stilloff.com");
-                      showToast("Link copied.");
+                      try {
+                        await navigator.clipboard.writeText("https://stilloff.com");
+                        showToast("Link copied.");
+                      } catch {
+                        showToast("Couldn't copy — try manually.");
+                      }
                     }}
                     className="flex-1 rounded-xl py-2.5 text-sm font-medium transition-colors hover:text-[#F4EFE8]"
                     style={{ border: "1px solid rgba(244,239,232,0.12)", color: "#A09480" }}
