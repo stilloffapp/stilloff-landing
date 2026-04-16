@@ -674,7 +674,7 @@ export default function Home() {
               </h1>
 
               <p className="text-xl leading-relaxed mb-10 max-w-lg" style={{ color: "#A09480" }}>
-                A 60-second breathing lock that interrupts the spiral the moment it starts — before the next hour disappears.
+                It stops the moment you lose control.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-14 w-full sm:w-auto">
@@ -694,24 +694,6 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* stats — headline scale */}
-              <div className="flex flex-wrap gap-8 items-start">
-                {[
-                  { value: "186×", label: "daily pickups" },
-                  { value: "4.3h", label: "avg screen time" },
-                  { value: "60s", label: "to reset" },
-                ].map((s, i) => (
-                  <div key={i} className="flex items-start gap-8">
-                    {i > 0 && (
-                      <div className="w-px mt-1 hidden sm:block" style={{ height: 40, background: "rgba(244,239,232,0.10)" }} />
-                    )}
-                    <div>
-                      <div className="font-serif text-3xl md:text-4xl font-light leading-none" style={{ color: "#C4956A" }}>{s.value}</div>
-                      <div className="text-xs tracking-wider uppercase mt-2" style={{ color: "#6A6058" }}>{s.label}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* ── Right: phone ── */}
@@ -729,40 +711,6 @@ export default function Home() {
 
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
           <div className="scroll-cue" />
-        </div>
-      </section>
-
-      {/* ══ THE SPIRAL ═══════════════════════════════════════════════════════ */}
-      <section className="px-6 py-28 max-w-5xl mx-auto">
-        <FadeUp>
-          <p className="font-serif text-4xl md:text-5xl font-light leading-snug max-w-2xl mb-6" style={{ color: "#F4EFE8" }}>
-            You didn&apos;t decide to spiral. It was already happening.
-          </p>
-          <p className="max-w-lg text-lg leading-7 mb-16" style={{ color: "#A09480" }}>
-            StillOff steps in at that exact moment. Before the loop closes. Before the next hour disappears.
-          </p>
-        </FadeUp>
-
-        <div className="grid md:grid-cols-2 gap-5">
-          {[
-            "One notification. Then forty-five minutes gone.",
-            "You said five minutes. You meant it. It\u2019s been an hour.",
-          ].map((text, i) => (
-            <FadeUp key={i} delay={i * 0.1}>
-              <div
-                className="rounded-2xl p-10 h-full"
-                style={{
-                  background: "#161210",
-                  border: "1px solid rgba(244,239,232,0.07)",
-                  borderLeft: "3px solid rgba(196,149,106,0.45)",
-                }}
-              >
-                <p className="font-serif text-2xl md:text-3xl font-light leading-snug" style={{ color: "#D4C8BC" }}>
-                  &ldquo;{text}&rdquo;
-                </p>
-              </div>
-            </FadeUp>
-          ))}
         </div>
       </section>
 
@@ -859,6 +807,37 @@ export default function Home() {
         </FadeUp>
       </section>
 
+      {/* ══ DEMO CALLOUT ═════════════════════════════════════════════════════ */}
+      <section className="px-6 py-10 text-center">
+        <FadeUp>
+          <div
+            className="max-w-xl mx-auto rounded-3xl p-12 relative overflow-hidden"
+            style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.07)" }}
+          >
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: "radial-gradient(ellipse 80% 60% at 50% 105%, rgba(110,70,55,0.22) 0%, transparent 65%)",
+              }}
+            />
+            <div className="relative flex flex-col items-center">
+              <div className="mb-8"><StillOrb size={120} /></div>
+              <h2 className="font-serif text-4xl md:text-5xl font-light mb-4">Feel it for yourself.</h2>
+              <p className="mb-8 text-base" style={{ color: "#A09480" }}>
+                This is what 60 seconds of control feels like.
+              </p>
+              <button
+                onClick={openDemo}
+                className="cta-glow font-medium px-8 py-5 rounded-2xl text-base"
+                style={{ background: "#F4EFE8", color: "#0E0D0B" }}
+              >
+                Try the 60-second lock
+              </button>
+            </div>
+          </div>
+        </FadeUp>
+      </section>
+
       {/* ══ HOW IT WORKS ═════════════════════════════════════════════════════ */}
       <section id="how" className="px-6 py-28 max-w-5xl mx-auto">
         <FadeUp>
@@ -910,37 +889,6 @@ export default function Home() {
             </FadeUp>
           ))}
         </div>
-      </section>
-
-      {/* ══ DEMO CALLOUT ═════════════════════════════════════════════════════ */}
-      <section className="px-6 py-10 text-center">
-        <FadeUp>
-          <div
-            className="max-w-xl mx-auto rounded-3xl p-12 relative overflow-hidden"
-            style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.07)" }}
-          >
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background: "radial-gradient(ellipse 80% 60% at 50% 105%, rgba(110,70,55,0.22) 0%, transparent 65%)",
-              }}
-            />
-            <div className="relative flex flex-col items-center">
-              <div className="mb-8"><StillOrb size={120} /></div>
-              <h2 className="font-serif text-4xl md:text-5xl font-light mb-4">Feel it for yourself.</h2>
-              <p className="mb-8 text-base" style={{ color: "#A09480" }}>
-                This is what 60 seconds of control feels like.
-              </p>
-              <button
-                onClick={openDemo}
-                className="cta-glow font-medium px-8 py-5 rounded-2xl text-base"
-                style={{ background: "#F4EFE8", color: "#0E0D0B" }}
-              >
-                Try the 60-second lock
-              </button>
-            </div>
-          </div>
-        </FadeUp>
       </section>
 
       {/* ══ FEATURES ═════════════════════════════════════════════════════════ */}
@@ -1125,7 +1073,7 @@ export default function Home() {
           </p>
           <h2 className="font-serif text-4xl md:text-5xl font-light text-center mb-5">Simple. Honest.</h2>
           <p className="text-center mb-10 text-base" style={{ color: "#A09480" }}>
-            Start free. Upgrade when you feel the difference.
+            See the paths. Join early access first.
           </p>
 
           {/* billing toggle */}

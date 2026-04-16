@@ -1,0 +1,39 @@
+STILLOFF FINAL SIMPLIFICATION PASS — NO DRIFT, NO REBUILD
+You are editing only the current app/page.tsx file.
+Hard rules (break any of these and the edit is invalid):
+
+Do NOT rebuild or rewrite the entire page
+Do NOT delete any section except the one explicitly allowed below
+Do NOT change the cinematic hero structure or orb
+Do NOT change pricing cards layout or prices
+Do NOT change the comparison table
+Do NOT add or remove any new components
+
+Apply ONLY these 4 exact changes:
+
+Compress the Hero
+Keep the headline, the two CTAs, and the PhoneMockup.
+Change the subhead paragraph to:
+“It stops the moment you lose control.”
+Completely remove the entire 3-metrics row (the 186× / 4.3h / 60s stats block).
+Remove the redundant Spiral section
+Delete the entire “THE SPIRAL” section (the one that starts with “You didn’t decide to spiral...” and has the two quote cards).
+Keep “The Moment” section.
+Move the Demo Callout up
+Move the entire “DEMO CALLOUT” section so it sits directly after the “WHY DIFFERENT” section (comparison table).
+New order after hero must be:
+Why Different → Demo Callout → How It Works → Soft Landing → Big Quote → Proof → Pricing → FAQ → Waitlist
+Fix Pricing intro line
+Change the small intro paragraph directly above the pricing cards from:
+“Start free. Upgrade when you feel the difference.”
+to:
+“See the paths. Join early access first.”
+
+After making exactly these 4 changes, run npm run build.
+Return ONLY:
+
+The full updated app/page.tsx code
+One line: “Build passed ✅”
+
+No explanations. No extra changes. No drift.
+This is the final pass.
