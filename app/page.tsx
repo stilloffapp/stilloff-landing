@@ -636,6 +636,10 @@ export default function Home() {
 
             {/* ── Left: copy ── */}
             <div className="flex flex-col items-start">
+              {/* mobile orb — only on small screens where phone is hidden */}
+              <div className="flex justify-center w-full mb-8 md:hidden">
+                <StillOrb size={160} />
+              </div>
               {/* badge */}
               <div className="flex items-center gap-2 mb-8 px-3 py-1.5 rounded-full"
                 style={{ background: "rgba(196,149,106,0.10)", border: "1px solid rgba(196,149,106,0.22)" }}>
@@ -676,18 +680,18 @@ export default function Home() {
               </div>
 
               {/* stats — headline scale */}
-              <div className="flex gap-10 items-start">
+              <div className="flex flex-wrap gap-8 items-start">
                 {[
                   { value: "186×", label: "daily pickups" },
                   { value: "4.3h", label: "avg screen time" },
                   { value: "60s", label: "to reset" },
                 ].map((s, i) => (
-                  <div key={i} className="flex items-start gap-10">
+                  <div key={i} className="flex items-start gap-8">
                     {i > 0 && (
-                      <div className="w-px mt-1" style={{ height: 40, background: "rgba(244,239,232,0.10)" }} />
+                      <div className="w-px mt-1 hidden sm:block" style={{ height: 40, background: "rgba(244,239,232,0.10)" }} />
                     )}
                     <div>
-                      <div className="font-serif text-4xl font-light leading-none" style={{ color: "#C4956A" }}>{s.value}</div>
+                      <div className="font-serif text-3xl md:text-4xl font-light leading-none" style={{ color: "#C4956A" }}>{s.value}</div>
                       <div className="text-xs tracking-wider uppercase mt-2" style={{ color: "#6A6058" }}>{s.label}</div>
                     </div>
                   </div>
