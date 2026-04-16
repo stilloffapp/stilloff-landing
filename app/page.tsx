@@ -218,13 +218,19 @@ function DemoModal({
               }}
             />
 
+            {/* close — large, always visible */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full transition-colors text-lg"
-              style={{ background: "rgba(244,239,232,0.07)", color: "#A09480" }}
+              className="absolute top-4 right-4 w-11 h-11 flex items-center justify-center rounded-full border transition-colors hover:border-white/30 hover:text-[#F4EFE8] z-10"
+              style={{
+                background: "rgba(244,239,232,0.06)",
+                border: "1px solid rgba(244,239,232,0.14)",
+                color: "#A09480",
+                fontSize: 18,
+              }}
               aria-label="Close"
             >
-              ×
+              ✕
             </button>
 
             <div className="relative flex flex-col items-center" style={{ minHeight: 340 }}>
@@ -236,7 +242,7 @@ function DemoModal({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.5 }}
-                    className="flex flex-col items-center justify-center pt-6"
+                    className="flex flex-col items-center justify-center pt-8"
                   >
                     <p className="text-xs tracking-[0.22em] uppercase mb-7" style={{ color: "#A09480" }}>
                       Lock starting…
@@ -254,15 +260,19 @@ function DemoModal({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.6 }}
-                    className="flex flex-col items-center gap-6"
+                    className="flex flex-col items-center pt-4"
+                    style={{ gap: 24 }}
                   >
-                    <StillOrb size={120} intense />
+                    {/* orb isolated — overflow clipped to prevent text bleed */}
+                    <div style={{ width: 100, height: 100, flexShrink: 0, overflow: "visible" }}>
+                      <StillOrb size={100} intense />
+                    </div>
                     <p className="text-xs tracking-[0.26em] uppercase" style={{ color: "#A09480" }}>
                       {label}
                     </p>
                     <button
                       onClick={onClose}
-                      className="mt-2 text-xs px-5 py-2 rounded-xl border transition-colors"
+                      className="text-xs px-5 py-2 rounded-xl border transition-colors hover:text-[#F4EFE8]"
                       style={{ borderColor: "rgba(244,239,232,0.12)", color: "#6A6058" }}
                     >
                       End session
@@ -468,11 +478,12 @@ export default function Home() {
       yearlyPrice: "$79.99/yr",
       desc: "For when the spiral is strongest.",
       features: [
-        "Everything in Plus",
         "Letter to My Future Self",
-        "Private community access",
+        "Private community",
+        "Therapist-curated prompts",
+        "Unlimited interventions",
+        "Extended lock durations",
         "Advanced recovery modes",
-        "Therapist prompt library",
       ],
       highlighted: false,
       cta: "Get early access" as string | null,
