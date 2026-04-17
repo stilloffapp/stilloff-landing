@@ -288,7 +288,7 @@ export default function Page() {
               </m.p>
               <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.5 }} className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <button onClick={openDemo} className="cta-glow rounded-full bg-[#C4956A] px-7 py-3.5 text-sm font-semibold text-[#0E0D0B] transition hover:bg-[#D4A57A]">Try the 60-second lock</button>
-                <button onClick={() => scrollTo("waitlist")} className="rounded-full border border-white/15 px-7 py-3.5 text-sm font-semibold text-[#F4EFE8] transition hover:border-white/25 hover:bg-white/[0.04]">Get early access</button>
+                <button onClick={() => scrollTo("waitlist")} className="cta-glow-subtle rounded-full border border-white/15 px-7 py-3.5 text-sm font-semibold text-[#F4EFE8] transition hover:border-white/25 hover:bg-white/[0.04]">Get early access</button>
               </m.div>
               <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 0.7 }} className="mt-12 flex items-center gap-8 sm:gap-10">
                 {[["186×", "average daily pickups"], ["4.3h", "time spent scrolling"], ["60s", "to break the loop"]].map(([s, l]) => (
