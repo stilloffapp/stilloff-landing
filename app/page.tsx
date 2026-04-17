@@ -239,16 +239,16 @@ export default function Page() {
 
         {/* ── NAV ── */}
         <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0E0D0B]/80 backdrop-blur-xl">
-          <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-            <div className="font-serif text-2xl font-light tracking-[-0.04em] text-[#F4EFE8]">StillOff</div>
+          <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-6">
+            <div className="font-serif text-3xl font-light tracking-[-0.04em] text-[#F4EFE8]">StillOff</div>
             {/* desktop nav */}
-            <div className="hidden items-center gap-7 text-[13px] text-[#A69B8D] md:flex">
+            <div className="hidden items-center gap-8 text-sm text-[#A69B8D] md:flex">
               {navLinks.map(l => (
                 <button key={l.id} onClick={() => scrollTo(l.id)} className="transition-colors hover:text-[#F4EFE8]">{l.label}</button>
               ))}
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={() => scrollTo("waitlist")} className="cta-glow rounded-full bg-[#C4956A] px-5 py-2 text-[13px] font-semibold text-[#0E0D0B] transition hover:bg-[#D4A57A]">Get early access</button>
+              <button onClick={() => scrollTo("waitlist")} className="cta-glow rounded-full bg-[#C4956A] px-6 py-2.5 text-sm font-semibold text-[#0E0D0B] transition hover:bg-[#D4A57A]">Get early access</button>
               {/* mobile hamburger */}
               <button onClick={() => setMobileNav(!mobileNav)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 md:hidden" aria-label="Menu">
                 <span className="flex flex-col gap-1">{[0,1,2].map(i => <span key={i} className="block h-[1.5px] w-4 rounded-full bg-[#A69B8D]" />)}</span>
