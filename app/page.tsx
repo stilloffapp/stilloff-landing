@@ -891,18 +891,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══ FEATURES ═════════════════════════════════════════════════════════ */}
-      <section className="px-6 py-28 max-w-5xl mx-auto">
-        <FadeUp>
-          <p className="text-xs tracking-[0.22em] uppercase text-center mb-5" style={{ color: "#A09480" }}>
-            What&apos;s inside
-          </p>
-          <h2 className="font-serif text-4xl md:text-5xl font-light text-center mb-16">
-            Built for the spiral.
-          </h2>
-        </FadeUp>
-
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
           {[
             {
               symbol: "⏸",
