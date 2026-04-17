@@ -291,10 +291,11 @@ export default function Page() {
                 <button onClick={() => scrollTo("waitlist")} className="cta-glow-subtle rounded-full border border-white/15 px-7 py-3.5 text-sm font-semibold text-[#F4EFE8] transition hover:border-white/25 hover:bg-white/[0.04]">Get early access</button>
               </m.div>
               <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 0.7 }} className="mt-12 flex items-center gap-8 sm:gap-10">
-                {[["186×", "average daily pickups"], ["4.3h", "time spent scrolling"], ["60s", "to break the loop"]].map(([s, l]) => (
+                {[["58–205×", "phone pickups per day"], ["5h 1m", "daily phone screen time"], ["46%", "say they feel addicted"]].map(([s, l]) => (
                   <div key={s}><p className="font-serif text-2xl tracking-[-0.03em] text-[#F4EFE8]">{s}</p><p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-[#A69B8D]/50">{l}</p></div>
                 ))}
               </m.div>
+              <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.9 }} className="mt-3 text-[9px] text-[#A69B8D]/30">Reviews.org 2026 · Harmony Healthcare IT 2025</m.p>
             </div>
             {/* phone mockup — shows active lock screen */}
             <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.2 }} className="relative mx-auto w-full max-w-[400px]">

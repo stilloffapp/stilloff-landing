@@ -19,29 +19,27 @@ body {
   color: #F4EFE8;
 }
 
-/* Bright white glow on all primary action buttons */
+/* Clean white glow — visible but not blinding */
 .cta-glow {
   box-shadow:
-    0 0 18px rgba(255, 255, 255, 0.30),
-    0 0 40px rgba(255, 255, 255, 0.12),
-    0 0 80px rgba(255, 255, 255, 0.05);
+    0 0 16px rgba(255, 255, 255, 0.18),
+    0 0 40px rgba(255, 255, 255, 0.06);
   transition: box-shadow 0.4s ease, transform 0.3s ease;
 }
 .cta-glow:hover {
   box-shadow:
-    0 0 24px rgba(255, 255, 255, 0.45),
-    0 0 50px rgba(255, 255, 255, 0.18),
-    0 0 100px rgba(255, 255, 255, 0.08);
+    0 0 22px rgba(255, 255, 255, 0.28),
+    0 0 50px rgba(255, 255, 255, 0.10);
   transform: translateY(-1px);
 }
 
 /* Subtle glow for secondary/outline buttons */
 .cta-glow-subtle {
-  box-shadow: 0 0 14px rgba(255, 255, 255, 0.10);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
   transition: box-shadow 0.4s ease;
 }
 .cta-glow-subtle:hover {
-  box-shadow: 0 0 22px rgba(255, 255, 255, 0.20);
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.15);
 }
 
 @media (prefers-reduced-motion: reduce) {
