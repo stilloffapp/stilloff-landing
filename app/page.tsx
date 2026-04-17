@@ -330,92 +330,94 @@ export default function Page() {
         </section>
 
         {/* ════════════════════════════════════════════════════
-            AFTER THE LOCK — what happens next
+            YOUR EMOTIONAL TOOLKIT — the full product
         ════════════════════════════════════════════════════ */}
-        <section className="relative z-10 mx-auto max-w-5xl px-6 py-24 sm:px-8 lg:px-12">
-          <FadeIn className="mb-14 text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.25em] text-[#C4956A]">After the lock</p>
+        <section className="relative z-10 mx-auto max-w-7xl px-6 py-24 sm:px-8 lg:px-12">
+          <FadeIn className="mx-auto mb-16 max-w-3xl text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.25em] text-[#C4956A]">More than an intervention</p>
             <h2 className="mx-auto mt-4 max-w-2xl font-serif text-4xl tracking-[-0.04em] text-[#F4EFE8] sm:text-5xl">
-              The silence is just the beginning.
+              An emotional refuge that lives on your phone.
             </h2>
-          </FadeIn>
-          <div className="grid gap-6 md:grid-cols-3">
-            {[
-              { label: "Reflect", icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>, body: "Guided journaling to write through what you\u2019re feeling." },
-              { label: "Reset", icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>, body: "Therapist-curated prompts and breathing tools." },
-              { label: "Recover", icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>, body: "Soft Landing 15-minute firewall and pattern learning." },
-            ].map((card, i) => (
-              <FadeIn key={card.label} delay={i * 0.1}>
-                <div className="h-full rounded-[1.75rem] border border-white/[0.06] bg-white/[0.02] p-7 transition-colors hover:border-[#C4956A]/20 hover:bg-white/[0.03]">
-                  <div className="mb-5">{card.icon}</div>
-                  <p className="font-serif text-2xl tracking-[-0.03em] text-[#F4EFE8]">{card.label}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-[#A69B8D]">{card.body}</p>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-        </section>
-
-        {/* ════════════════════════════════════════════════════
-            CREDIBILITY BAR
-        ════════════════════════════════════════════════════ */}
-        <section className="relative z-10 border-y border-white/[0.04] bg-white/[0.01]">
-          <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-12 gap-y-4 px-6 py-6 text-center text-xs text-[#A69B8D]/60">
-            <span>Based on behavioral intervention research</span>
-            <span className="hidden text-[#C4956A]/30 sm:inline">✦</span>
-            <span>Intervention-based approach shown to reduce app opens by 57%</span>
-            <span className="hidden text-[#C4956A]/30 sm:inline">✦</span>
-            <span>iOS &amp; Android</span>
-          </div>
-        </section>
-
-        {/* ════════════════════════════════════════════════════
-            3. THE PROBLEM — full-width editorial
-        ════════════════════════════════════════════════════ */}
-        <section className="relative z-10 mx-auto max-w-4xl px-6 py-28 sm:px-8 lg:px-12">
-          <FadeIn>
-            <p className="max-w-2xl font-serif text-4xl leading-[1.15] tracking-[-0.03em] text-[#F4EFE8] sm:text-5xl">
-              You didn&rsquo;t decide to spiral. <span className="text-[#A69B8D]">It was already happening&nbsp;&mdash; the moment you picked it up.</span>
-            </p>
-            <p className="mt-8 max-w-xl text-base leading-7 text-[#A69B8D]/80">
-              Screen time apps track your usage after the fact. App blockers rely on schedules you set when you&rsquo;re motivated. StillOff is different &mdash; it intervenes in the exact moment compulsive behavior starts, before the loop closes, before the next ten minutes disappear.
+            <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#A69B8D]">
+              StillOff isn&rsquo;t a blocker. It&rsquo;s a complete recovery system &mdash; intervention, breathing, journaling, therapy tools, and a soft landing back to yourself.
             </p>
           </FadeIn>
-        </section>
 
-        {/* ════════════════════════════════════════════════════
-            4. THE SCIENCE — why intervention works
-        ════════════════════════════════════════════════════ */}
-        <section id="science" className="relative z-10 overflow-hidden">
-          <div className="relative mx-auto max-w-7xl px-6 py-24 sm:px-8 lg:px-12">
-            {/* subtle bg accent */}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#C4956A]/[0.03] via-transparent to-transparent" aria-hidden="true" />
-            <FadeIn className="relative z-10 mx-auto max-w-5xl">
-              <p className="text-xs font-medium uppercase tracking-[0.25em] text-[#C4956A]">The Science</p>
-              <h2 className="mt-4 max-w-3xl font-serif text-4xl tracking-[-0.04em] text-[#F4EFE8] sm:text-5xl">Friction works. StillOff makes it count.</h2>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-[#A69B8D]">Research published in PNAS shows that adding a brief intervention before opening an app reduces compulsive usage by 57% in six weeks. StillOff takes this further &mdash; not just a pause, but a guided breathing reset that physically interrupts the compulsion.</p>
+          <div className="mx-auto grid max-w-5xl gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {/* The Lock — large card with orb */}
+            <FadeIn className="sm:col-span-2 lg:col-span-2">
+              <div className="relative flex h-full min-h-[240px] flex-col justify-end overflow-hidden rounded-[1.75rem] border border-white/[0.06] bg-white/[0.02] p-8">
+                <div className="pointer-events-none absolute right-6 top-6 opacity-30"><BreathingOrb size={140} /></div>
+                <p className="text-xs font-medium uppercase tracking-[0.25em] text-[#C4956A]">The intervention</p>
+                <p className="mt-3 font-serif text-3xl tracking-[-0.03em] text-[#F4EFE8]">The Lock</p>
+                <p className="mt-3 max-w-md text-sm leading-relaxed text-[#A69B8D]">When compulsive behavior starts, your phone becomes a guided breathing space. 60 seconds of stillness before the spiral takes over.</p>
+              </div>
             </FadeIn>
-            <div className="relative z-10 mx-auto mt-14 grid max-w-4xl gap-5 sm:grid-cols-3">
-              {[
-                { num: "57%", label: "reduction in compulsive app opens with intervention-based approach", cite: "PNAS, 2023" },
-                { num: "36%", label: "of users dismiss their consumption attempt after a brief pause", cite: "Behavioral research" },
-                { num: "60s", label: "is all it takes to break the loop and reset your nervous system", cite: "StillOff system" },
-              ].map((s, i) => (
-                <FadeIn key={s.num} delay={i * 0.1}>
-                  <div className="rounded-[1.5rem] border border-[#C4956A]/10 bg-[#C4956A]/[0.04] p-6 text-center">
-                    <p className="font-serif text-5xl tracking-[-0.05em] text-[#C4956A]">{s.num}</p>
-                    <p className="mt-3 text-sm leading-relaxed text-[#A69B8D]">{s.label}</p>
-                    <p className="mt-2 text-[10px] uppercase tracking-wider text-[#A69B8D]/40">{s.cite}</p>
-                  </div>
-                </FadeIn>
-              ))}
-            </div>
+
+            {/* Guided Breathing */}
+            <FadeIn delay={0.07}>
+              <div className="h-full rounded-[1.75rem] border border-white/[0.06] bg-white/[0.02] p-7 transition-colors hover:border-[#C4956A]/20 hover:bg-white/[0.03]">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round" className="mb-4"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8v8" /></svg>
+                <p className="font-serif text-xl tracking-[-0.03em] text-[#F4EFE8]">Guided Breathing</p>
+                <p className="mt-2 text-sm leading-relaxed text-[#A69B8D]">Box breathing, 4-7-8, and custom patterns. Your nervous system gets a reset.</p>
+              </div>
+            </FadeIn>
+
+            {/* Journaling */}
+            <FadeIn delay={0.1}>
+              <div className="h-full rounded-[1.75rem] border border-white/[0.06] bg-white/[0.02] p-7 transition-colors hover:border-[#C4956A]/20 hover:bg-white/[0.03]">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-4"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                <p className="font-serif text-xl tracking-[-0.03em] text-[#F4EFE8]">Journaling</p>
+                <p className="mt-2 text-sm leading-relaxed text-[#A69B8D]">Write through what you&rsquo;re feeling. Guided prompts help you process instead of scroll.</p>
+              </div>
+            </FadeIn>
+
+            {/* Letter to My Future Self — featured card */}
+            <FadeIn delay={0.14} className="sm:col-span-2 lg:col-span-1">
+              <div className="h-full rounded-[1.75rem] border border-[#C4956A]/15 bg-[#C4956A]/[0.04] p-7 transition-colors hover:border-[#C4956A]/25">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-4"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+                <p className="font-serif text-xl tracking-[-0.03em] text-[#F4EFE8]">Letter to My Future Self</p>
+                <p className="mt-2 text-sm leading-relaxed text-[#A69B8D]">Write to who you&rsquo;re becoming. StillOff delivers it when you need it most. Only here.</p>
+              </div>
+            </FadeIn>
+
+            {/* Therapist-Curated Prompts */}
+            <FadeIn delay={0.17}>
+              <div className="h-full rounded-[1.75rem] border border-white/[0.06] bg-white/[0.02] p-7 transition-colors hover:border-[#C4956A]/20 hover:bg-white/[0.03]">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-4"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                <p className="font-serif text-xl tracking-[-0.03em] text-[#F4EFE8]">Therapist-Curated Prompts</p>
+                <p className="mt-2 text-sm leading-relaxed text-[#A69B8D]">Tools designed by real therapists. Not productivity hacks &mdash; genuine emotional support.</p>
+              </div>
+            </FadeIn>
+
+            {/* Soft Landing */}
+            <FadeIn delay={0.2}>
+              <div className="h-full rounded-[1.75rem] border border-white/[0.06] bg-white/[0.02] p-7 transition-colors hover:border-[#C4956A]/20 hover:bg-white/[0.03]">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round" className="mb-4"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 01-3.46 0" /></svg>
+                <p className="font-serif text-xl tracking-[-0.03em] text-[#F4EFE8]">Soft Landing</p>
+                <p className="mt-2 text-sm leading-relaxed text-[#A69B8D]">A 15-minute buffer after the lock lifts. You don&rsquo;t get dropped back into the spiral.</p>
+              </div>
+            </FadeIn>
+
+            {/* Pattern Learning */}
+            <FadeIn delay={0.23}>
+              <div className="h-full rounded-[1.75rem] border border-white/[0.06] bg-white/[0.02] p-7 transition-colors hover:border-[#C4956A]/20 hover:bg-white/[0.03]">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round" className="mb-4"><path d="M12 2a10 10 0 0110 10 10 10 0 01-10 10A10 10 0 012 12 10 10 0 0112 2z" /><path d="M12 6v6l4 2" /></svg>
+                <p className="font-serif text-xl tracking-[-0.03em] text-[#F4EFE8]">Pattern Learning</p>
+                <p className="mt-2 text-sm leading-relaxed text-[#A69B8D]">StillOff learns your triggers over time. It steps in before you even realize you need it.</p>
+              </div>
+            </FadeIn>
+
+            {/* Private by Default */}
+            <FadeIn delay={0.26}>
+              <div className="h-full rounded-[1.75rem] border border-white/[0.06] bg-white/[0.02] p-7 transition-colors hover:border-[#C4956A]/20 hover:bg-white/[0.03]">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-4"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0110 0v4" /></svg>
+                <p className="font-serif text-xl tracking-[-0.03em] text-[#F4EFE8]">Private by Default</p>
+                <p className="mt-2 text-sm leading-relaxed text-[#A69B8D]">Your data stays on your device. No tracking, no selling, no judgment. This is your space.</p>
+              </div>
+            </FadeIn>
           </div>
         </section>
-
-        {/* ════════════════════════════════════════════════════
-            5. HOW IT WORKS — 3 phone screens visual journey
-        ════════════════════════════════════════════════════ */}
         <section id="how-it-works" className="relative z-10 mx-auto max-w-7xl px-6 py-24 sm:px-8 lg:px-12">
           <FadeIn className="mx-auto mb-16 max-w-3xl text-center">
             <p className="text-xs font-medium uppercase tracking-[0.25em] text-[#C4956A]">How it works</p>
@@ -513,42 +515,50 @@ export default function Page() {
         </section>
 
         {/* ════════════════════════════════════════════════════
-            8. FEATURES BENTO GRID — visual variety
+            EDITORIAL BRIDGE
         ════════════════════════════════════════════════════ */}
-        <section className="relative z-10 mx-auto max-w-7xl px-6 py-20 sm:px-8 lg:px-12">
-          <FadeIn className="mx-auto mb-14 max-w-3xl text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.25em] text-[#C4956A]">Features</p>
-            <h2 className="mt-4 font-serif text-4xl tracking-[-0.04em] text-[#F4EFE8] sm:text-5xl">Everything the spiral fears.</h2>
+        <section className="relative z-10 mx-auto max-w-4xl px-6 py-28 sm:px-8 lg:px-12">
+          <FadeIn>
+            <p className="max-w-2xl font-serif text-4xl leading-[1.15] tracking-[-0.03em] text-[#F4EFE8] sm:text-5xl">
+              You didn&rsquo;t decide to spiral. <span className="text-[#A69B8D]">It was already happening&nbsp;&mdash; the moment you picked it up.</span>
+            </p>
+            <p className="mt-8 max-w-xl text-base leading-7 text-[#A69B8D]/80">
+              Screen time apps track your usage after the fact. App blockers rely on schedules you set when you&rsquo;re motivated. StillOff is different &mdash; it intervenes in the exact moment compulsive behavior starts, before the loop closes, before the next ten minutes disappear.
+            </p>
           </FadeIn>
-          <div className="mx-auto grid max-w-5xl gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {/* large card */}
-            <FadeIn className="sm:col-span-2 lg:col-span-2">
-              <div className="relative flex h-full min-h-[220px] flex-col justify-end overflow-hidden rounded-[1.75rem] border border-white/[0.06] bg-white/[0.02] p-7">
-                <div className="pointer-events-none absolute right-6 top-6 opacity-40"><BreathingOrb size={120} /></div>
-                <p className="font-serif text-3xl tracking-[-0.03em] text-[#F4EFE8]">The Lock</p>
-                <p className="mt-3 max-w-sm text-sm leading-relaxed text-[#A69B8D]">When compulsive behavior starts, your phone locks into a 60-second guided breathing space. No apps, no notifications, no escape. Just stillness.</p>
-              </div>
+        </section>
+
+        {/* ════════════════════════════════════════════════════
+            THE SCIENCE
+        ════════════════════════════════════════════════════ */}
+        <section id="science" className="relative z-10 overflow-hidden">
+          <div className="relative mx-auto max-w-7xl px-6 py-24 sm:px-8 lg:px-12">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#C4956A]/[0.03] via-transparent to-transparent" aria-hidden="true" />
+            <FadeIn className="relative z-10 mx-auto max-w-5xl">
+              <p className="text-xs font-medium uppercase tracking-[0.25em] text-[#C4956A]">The Science</p>
+              <h2 className="mt-4 max-w-3xl font-serif text-4xl tracking-[-0.04em] text-[#F4EFE8] sm:text-5xl">Friction works. StillOff makes it count.</h2>
+              <p className="mt-5 max-w-2xl text-base leading-7 text-[#A69B8D]">Research published in PNAS shows that adding a brief intervention before opening an app reduces compulsive usage by 57% in six weeks. StillOff takes this further &mdash; not just a pause, but a guided breathing reset that physically interrupts the compulsion.</p>
             </FadeIn>
-            {/* standard cards */}
-            {[
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" /><path d="M8 12h8M12 8v8" /></svg>, title: "The Reset", body: "Sixty seconds of guided breathing. You come back to yourself." },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" /></svg>, title: "Soft Landing", body: "After the lock lifts, a 15-minute buffer keeps you from falling back into the loop." },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round"><path d="M12 2a10 10 0 0110 10 10 10 0 01-10 10A10 10 0 012 12 10 10 0 0112 2z" /><path d="M12 6v6l4 2" /></svg>, title: "Pattern Learning", body: "The more you use it, the better it recognizes your triggers. StillOff steps in before you even ask." },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" /></svg>, title: "Private by Default", body: "Your data stays on your device. No tracking, no selling, no judgment." },
-            ].map((f, i) => (
-              <FadeIn key={f.title} delay={i * 0.07}>
-                <div className="h-full rounded-[1.75rem] border border-white/[0.06] bg-white/[0.02] p-7 transition-colors hover:border-[#C4956A]/20 hover:bg-white/[0.03]">
-                  <div className="mb-4">{f.icon}</div>
-                  <p className="font-serif text-xl tracking-[-0.03em] text-[#F4EFE8]">{f.title}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-[#A69B8D]">{f.body}</p>
-                </div>
-              </FadeIn>
-            ))}
+            <div className="relative z-10 mx-auto mt-14 grid max-w-4xl gap-5 sm:grid-cols-3">
+              {[
+                { num: "57%", label: "reduction in compulsive app opens with intervention-based approach", cite: "PNAS, 2023" },
+                { num: "36%", label: "of users dismiss their consumption attempt after a brief pause", cite: "Behavioral research" },
+                { num: "60s", label: "is all it takes to break the loop and reset your nervous system", cite: "StillOff system" },
+              ].map((s, i) => (
+                <FadeIn key={s.num} delay={i * 0.1}>
+                  <div className="rounded-[1.5rem] border border-[#C4956A]/10 bg-[#C4956A]/[0.04] p-6 text-center">
+                    <p className="font-serif text-5xl tracking-[-0.05em] text-[#C4956A]">{s.num}</p>
+                    <p className="mt-3 text-sm leading-relaxed text-[#A69B8D]">{s.label}</p>
+                    <p className="mt-2 text-[10px] uppercase tracking-wider text-[#A69B8D]/40">{s.cite}</p>
+                  </div>
+                </FadeIn>
+              ))}
+            </div>
           </div>
         </section>
 
         {/* ════════════════════════════════════════════════════
-            9. TESTIMONIALS — journal style
+            TESTIMONIALS — journal style
         ════════════════════════════════════════════════════ */}
         <section className="relative z-10 mx-auto max-w-7xl px-6 py-20 sm:px-8 lg:px-12">
           <FadeIn className="mx-auto mb-14 max-w-3xl text-center">
