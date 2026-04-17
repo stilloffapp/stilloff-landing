@@ -891,52 +891,7 @@ export default function Home() {
         </div>
       </section>
 
-         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {[
-            {
-              symbol: "⏸",
-              label: "60-Second Lock",
-              desc: "A timed intervention that creates real separation between impulse and action.",
-            },
-            {
-              symbol: "✦",
-              label: "Therapist Prompts",
-              desc: "Curated micro-reflections that ground you — not motivational posters.",
-            },
-            {
-              symbol: "✉",
-              label: "Letter to My Future Self",
-              desc: "Write to the version of you who already broke the pattern. Premium only.",
-            },
-            {
-              symbol: "⬡",
-              label: "Recovery Modes",
-              desc: "Different protocols for different spiral types — doom-scroll, anxiety loop, work avoidance.",
-            },
-            {
-              symbol: "⊕",
-              label: "Private Community",
-              desc: "No feed, no performance. Others in the same work, behind a closed door.",
-            },
-            {
-              symbol: "◈",
-              label: "Extended Locks",
-              desc: "Go longer when the spiral is deep. 60s, 5 min, or full focus blocks.",
-            },
-          ].map((f, i) => (
-            <FadeUp key={i} delay={(i % 3) * 0.07}>
-              <div
-                className="rounded-2xl p-6 h-full"
-                style={{ background: "#141210", border: "1px solid rgba(244,239,232,0.06)" }}
-              >
-                <div className="text-xl mb-4" style={{ color: "#C4956A" }}>{f.symbol}</div>
-                <h3 className="text-sm font-medium mb-2">{f.label}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "#A09480" }}>{f.desc}</p>
-              </div>
-            </FadeUp>
-          ))}
-        </div>
-      </section>
+
 
       {/* ══ SOFT LANDING ═════════════════════════════════════════════════════ */}
       <section className="px-6 py-20 max-w-5xl mx-auto">
