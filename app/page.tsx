@@ -41,6 +41,40 @@ function FadeIn({ children, delay = 0, y = 24, className = "" }: { children: Rea
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   ANIMATED COUNTER — counts up when scrolled into view
+   ═══════════════════════════════════════════════════════════════════ */
+function AnimatedCounter({ from = 2827, to = 2847, duration = 2000 }: { from?: number; to?: number; duration?: number }) {
+  const [count, setCount] = useState(from);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          const startTime = performance.now();
+          const step = (now: number) => {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setCount(Math.round(from + (to - from) * eased));
+            if (progress < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [from, to, duration, hasAnimated]);
+
+  return <span ref={ref}>{count.toLocaleString()}</span>;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    MINI PHONE MOCKUP — used in How It Works
    ═══════════════════════════════════════════════════════════════════ */
 function MiniPhone({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -601,6 +635,14 @@ export default function Page() {
                     <button type="submit" className="cta-glow rounded-full bg-[#C4956A] px-6 py-3.5 text-sm font-semibold text-[#0E0D0B] transition hover:bg-[#D4A57A]">Get early access</button>
                   </form>
                   <p className="mt-4 text-xs text-[#A69B8D]/50">No newsletters. One email when it&rsquo;s ready.</p>
+                </div>
+                {/* waitlist counter */}
+                <div className="mt-10 flex items-center justify-center gap-3">
+                  <div className="h-2 w-2 rounded-full bg-[#C4956A]/60 shadow-[0_0_8px_rgba(196,149,106,0.4)]" />
+                  <p className="text-sm text-[#A69B8D]">
+                    <span className="font-serif text-xl tracking-[-0.02em] text-[#F4EFE8]"><AnimatedCounter from={2827} to={2847} duration={2200} /></span>
+                    {" "}people already on the waitlist
+                  </p>
                 </div>
               </div>
             </div>
