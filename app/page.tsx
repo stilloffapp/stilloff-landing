@@ -549,7 +549,7 @@ export default function Page() {
                   <div className="mt-5 flex-1 space-y-2.5">{tier.features.map((f) => (
                     <div key={f} className={`flex items-start gap-2.5 text-sm ${tier.highlight ? "text-[#5A4234]" : "text-[#A69B8D]"}`}><span className="mt-0.5 text-[10px] text-[#C4956A]">✦</span><span>{f}</span></div>
                   ))}</div>
-                  {tier.cta && <button onClick={() => scrollTo("waitlist")} className={`mt-6 block w-full rounded-full py-3 text-center text-xs font-semibold uppercase tracking-[0.12em] transition ${tier.highlight ? "bg-[#0E0D0B] text-[#F4EFE8] hover:bg-[#1A1917]" : "border border-white/10 text-[#F4EFE8] hover:border-white/20 hover:bg-white/[0.04]"}`}>{tier.cta}</button>}
+                  {tier.cta && <button onClick={() => scrollTo("waitlist")} className={`cta-glow mt-6 block w-full rounded-full py-3 text-center text-xs font-semibold uppercase tracking-[0.12em] transition ${tier.highlight ? "bg-[#0E0D0B] text-[#F4EFE8] hover:bg-[#1A1917]" : "border border-white/10 text-[#F4EFE8] hover:border-white/20 hover:bg-white/[0.04]"}`}>{tier.cta}</button>}
                 </div>
               ))}
             </div>
