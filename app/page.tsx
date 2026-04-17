@@ -308,6 +308,9 @@ export default function Page() {
               <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }} className="mb-5 text-xs uppercase tracking-[0.26em] text-[#BEB4A7]">
                 You picked up your phone 84 times today.
               </m.p>
+              <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.04 }} className="mb-3 text-xs uppercase tracking-[0.3em] text-[#C4956A]/80">
+                Your safe space
+              </m.p>
               <m.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.08 }} className="max-w-2xl leading-[0.93] tracking-[-0.06em] text-[#F3EEE6]" style={{ fontFamily: "var(--font-cormorant, Georgia, serif)", fontSize: "clamp(3rem,8vw,6rem)" }}>
                 {heroHeadline}
               </m.h1>
