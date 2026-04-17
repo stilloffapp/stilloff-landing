@@ -149,6 +149,14 @@ export default function RootLayout({
           },
           {
             "@type": "Question",
+            name: "How is StillOff different from Brick or one sec?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Brick requires a physical $60 device. one sec adds a brief pause. StillOff is a full intervention: 60 seconds of guided breathing + a soft landing + pattern learning. No hardware, no pauses you can tap through — a complete behavioral reset.",
+            },
+          },
+          {
+            "@type": "Question",
             name: "Is StillOff free?",
             acceptedAnswer: {
               "@type": "Answer",
