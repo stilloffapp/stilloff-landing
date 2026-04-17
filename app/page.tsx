@@ -273,25 +273,25 @@ export default function Page() {
         <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[110vh]" aria-hidden="true" style={{ opacity: 0.035, backgroundImage: "url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22 stitchTiles=%22stitch%22/></filter><rect width=%22200%22 height=%22200%22 filter=%22url(%23n)%22/></svg>')", mixBlendMode: "soft-light" as React.CSSProperties["mixBlendMode"] }} />
 
         {/* ════════════════════════════════════════════════════
-            1. HERO — split layout with phone showing live UI
+            1. HERO — calm refuge, breathing room
         ════════════════════════════════════════════════════ */}
         <section className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl items-center px-6 pb-20 pt-36 sm:px-8 lg:px-12">
           <div className="grid w-full items-center gap-14 lg:grid-cols-[1fr_480px]">
             <div>
-              <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7 }} className="mb-3 text-xs font-medium uppercase tracking-[0.3em] text-[#C4956A]">Your safe space</m.p>
-              <m.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.08 }} className="max-w-2xl font-serif leading-[0.93] tracking-[-0.06em] text-[#F4EFE8]" style={{ fontSize: "clamp(2.8rem,7.5vw,5.5rem)" }}>
+              <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.1 }} className="mb-4 text-xs font-medium uppercase tracking-[0.3em] text-[#C4956A]">Your safe space</m.p>
+              <m.h1 initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.1, delay: 0.2 }} className="max-w-2xl font-serif leading-[0.93] tracking-[-0.06em] text-[#F4EFE8]" style={{ fontSize: "clamp(2.8rem,7.5vw,5.5rem)" }}>
                 {heroHeadline}
               </m.h1>
-              <m.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.16 }} className="mt-7 max-w-xl text-lg leading-[1.5] text-[#A69B8D] sm:text-xl">
-                A 60-second breathing lock that interrupts the spiral the moment it starts. Not a blocker. Not a timer. <span className="text-[#F4EFE8]">A real-time intervention.</span>
+              <m.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.35 }} className="mt-8 max-w-lg text-lg leading-[1.6] text-[#A69B8D] sm:text-xl">
+                A 60-second breathing lock that interrupts the spiral the moment it starts.
               </m.p>
-              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.26 }} className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.5 }} className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <button onClick={openDemo} className="cta-glow rounded-full bg-[#C4956A] px-7 py-3.5 text-sm font-semibold text-[#0E0D0B] transition hover:bg-[#D4A57A]">Try the 60-second lock</button>
                 <button onClick={() => scrollTo("waitlist")} className="rounded-full border border-white/15 px-7 py-3.5 text-sm font-semibold text-[#F4EFE8] transition hover:border-white/25 hover:bg-white/[0.04]">Get early access</button>
               </m.div>
-              <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.4 }} className="mt-10 flex items-center gap-8 sm:gap-10">
-                {[["186×", "avg daily pickups"], ["4.3h", "lost to scrolling"], ["60s", "to break the loop"]].map(([s, l]) => (
-                  <div key={s}><p className="font-serif text-2xl tracking-[-0.03em] text-[#F4EFE8]">{s}</p><p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-[#A69B8D]/60">{l}</p></div>
+              <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 0.7 }} className="mt-12 flex items-center gap-8 sm:gap-10">
+                {[["186×", "average daily pickups"], ["4.3h", "time spent scrolling"], ["60s", "to break the loop"]].map(([s, l]) => (
+                  <div key={s}><p className="font-serif text-2xl tracking-[-0.03em] text-[#F4EFE8]">{s}</p><p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-[#A69B8D]/50">{l}</p></div>
                 ))}
               </m.div>
             </div>
