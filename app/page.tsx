@@ -103,7 +103,7 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
   useEffect(() => {
     if (!open) { setPhase("intro"); setLabel("Lock starting…"); return; }
     document.body.style.overflow = "hidden";
-    const breathMs = reduced ? 5000 : 60000;
+    const breathMs = reduced ? 5000 : 30000;
     const timers: ReturnType<typeof setTimeout>[] = [];
     timers.push(setTimeout(() => { setPhase("lock"); setLabel("Lock starting…"); }, 600));
     timers.push(setTimeout(() => { setPhase("breathing"); setLabel("Breathe in"); }, 2000));
@@ -145,6 +145,7 @@ function DemoModal({ open, onClose, onComplete, onSubmit }: {
               )}
               {phase === "breathing" && (
                 <m.div key="breathing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} className="flex flex-col items-center gap-0">
+                  <p className="mb-6 text-[10px] uppercase tracking-[0.22em] text-[#A69B8D]/40">30-second preview</p>
                   <BreathingOrb size={180} intense />
                   <p className="mt-14 text-xs uppercase tracking-[0.28em] text-[#A69B8D]">{label}</p>
                   <button onClick={onClose} className="mt-8 rounded-xl border border-white/10 px-6 py-2.5 text-xs font-medium text-[#A69B8D] transition hover:border-white/20 hover:text-[#F4EFE8]">End session</button>
@@ -329,7 +330,34 @@ export default function Page() {
         </section>
 
         {/* ════════════════════════════════════════════════════
-            2. CREDIBILITY BAR
+            AFTER THE LOCK — what happens next
+        ════════════════════════════════════════════════════ */}
+        <section className="relative z-10 mx-auto max-w-5xl px-6 py-24 sm:px-8 lg:px-12">
+          <FadeIn className="mb-14 text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.25em] text-[#C4956A]">After the lock</p>
+            <h2 className="mx-auto mt-4 max-w-2xl font-serif text-4xl tracking-[-0.04em] text-[#F4EFE8] sm:text-5xl">
+              The silence is just the beginning.
+            </h2>
+          </FadeIn>
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              { label: "Reflect", icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>, body: "Guided journaling to write through what you\u2019re feeling." },
+              { label: "Reset", icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>, body: "Therapist-curated prompts and breathing tools." },
+              { label: "Recover", icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C4956A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>, body: "Soft Landing 15-minute firewall and pattern learning." },
+            ].map((card, i) => (
+              <FadeIn key={card.label} delay={i * 0.1}>
+                <div className="h-full rounded-[1.75rem] border border-white/[0.06] bg-white/[0.02] p-7 transition-colors hover:border-[#C4956A]/20 hover:bg-white/[0.03]">
+                  <div className="mb-5">{card.icon}</div>
+                  <p className="font-serif text-2xl tracking-[-0.03em] text-[#F4EFE8]">{card.label}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-[#A69B8D]">{card.body}</p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </section>
+
+        {/* ════════════════════════════════════════════════════
+            CREDIBILITY BAR
         ════════════════════════════════════════════════════ */}
         <section className="relative z-10 border-y border-white/[0.04] bg-white/[0.01]">
           <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-12 gap-y-4 px-6 py-6 text-center text-xs text-[#A69B8D]/60">
